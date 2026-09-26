@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Clicker - O Jogo do Desenvolvedor</title>
+    <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para ícones estilizados -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonte JetBrains Mono / Inter para estética de terminal/IDE -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-green: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-amber: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Efeito de neon brilhante */
+        .glow-green {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
+        }
+
+        /* Botão principal de clique */
+        .click-btn {
+            transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .click-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Animações de números flutuantes */
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translateY(-40px) scale(1.15);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.8);
+            }
+        }
+
+        .floating-text {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            font-weight: 800;
+            z-index: 50;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        /* Animação do evento flutuante bônus */
+        @keyframes floatBonus {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .bonus-event {
+            animation: floatBonus 2.5s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar estilo IDE */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Efeito Scanline sutil estilo Monitor CRT/Terminal */
+        .scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.15) 50%,
+                rgba(0, 0, 0, 0.15)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative overflow-x-hidden select-none">
+    <div class="scanline fixed inset-0 z-40"></div>
+
+    <!-- Navbar / Header da IDE -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="flex gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                </div>
+                <h1 class="text-xl font-bold code-font tracking-wide flex items-center gap-2">
+                    <i class="fa-solid me-1 fa-code text-emerald-400"></i>
+                    <span>Dev<span class="text-emerald-400">Clicker</span>.js</span>
+                </h1>
+                <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline-block">v1.0.0</span>
+            </div>
+
+            <!-- Controles do Jogo (Som, AutoSave, Stats) -->
+            <div class="flex items-center gap-2">
+                <button id="soundToggleBtn" onclick="game.toggleSound()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-2 border border-slate-700 transition">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-emerald-400"></i>
+                    <span id="soundText" class="hidden md:inline">Som: LIGADO</span>
+                </button>
+                <button onclick="game.saveGame(true)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-2 border border-slate-700 transition">
+                    <i class="fa-solid fa-floppy-disk text-cyan-400"></i>
+                    <span class="hidden md:inline">Salvar</span>
+                </button>
+                <button onclick="game.confirmReset()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-red-900/50 text-red-400 hover:text-red-300 text-xs font-semibold flex items-center gap-2 border border-slate-700 transition">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="hidden md:inline">Resetar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 z-10">
+
+        <!-- PAINEL DA ESQUERDA: Métricas & Estatísticas Avançadas (Cols 3/12) -->
+        <section class="lg:col-span-3 flex flex-col gap-4">
+            <!-- Stats Principais -->
+            <div class="bg-slate-800/80 backdrop-blur border border-slate-700/60 rounded-xl p-5 shadow-lg flex flex-col gap-4">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-700/80 pb-2">
+                    <i class="fa-solid fa-chart-simple text-cyan-400"></i> Mapeamento de Código
+                </h2>
+
+                <div>
+                    <span class="text-xs text-slate-400 uppercase font-medium">Linhas por Segundo (CPS)</span>
+                    <div class="text-2xl font-bold code-font text-cyan-400 flex items-center gap-2" id="cpsDisplay">
+                        0.0
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs text-slate-400 uppercase font-medium">Linhas por Clique (CPC)</span>
+                    <div class="text-2xl font-bold code-font text-purple-400 flex items-center gap-2" id="cpcDisplay">
+                        1.0
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-700/80">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1">
+                        <span>Progresso da Meta</span>
+                        <span id="nextGoalPercent" class="code-font text-emerald-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                        <div id="goalProgressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="nextGoalText" class="text-xs text-slate-400 mt-1.5 italic text-right">Próxima meta: 100 LOC</p>
+                </div>
+            </div>
+
+            <!-- Painel de Conquistas (Aba resumida) -->
+            <div class="bg-slate-800/80 backdrop-blur border border-slate-700/60 rounded-xl p-5 shadow-lg flex-1 flex flex-col">
+                <div class="flex justify-between items-center border-b border-slate-700/80 pb-2 mb-3">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-400"></i> Conquistas
+                    </h2>
+                    <span id="achievementRatio" class="text-xs code-font bg-slate-900 px-2 py-0.5 rounded text-amber-400 font-bold">0/0</span>
+                </div>
+                <div id="achievementsContainer" class="flex-1 overflow-y-auto max-h-[260px] lg:max-h-none space-y-2 pr-1">
+                    <!-- Conquistas inseridas dinamicamente aqui via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PAINEL CENTRAL: Área de Clique Principal (Cols 5/12) -->
+        <section class="lg:col-span-5 flex flex-col items-center justify-center gap-6 py-4">
+            <!-- Total de LOC em Grande Destaque -->
+            <div class="text-center w-full bg-slate-800/40 p-6 rounded-2xl border border-slate-700/50 backdrop-blur relative overflow-hidden">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-1">Linhas de Código Totais</span>
+                <div class="text-4xl sm:text-5xl font-black code-font text-emerald-400 tracking-tight glow-green py-2 rounded-xl bg-slate-900/80 border border-emerald-500/20" id="locDisplay">
+                    0
+                </div>
+                <span class="text-xs text-slate-500 mt-2 block">LOC acumuladas na sua carreira dev</span>
+                
+                <!-- Multiplicador Ativo (Se Houver) -->
+                <div id="multiplierBadge" class="hidden mt-2 inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 border border-amber-500/50 rounded-full text-amber-300 text-xs font-bold animate-pulse">
+                    <i class="fa-solid fa-bolt"></i> BÔNUS x2 ATIVO! (<span id="multiplierTimer">10</span>s)
+                </div>
+            </div>
+
+            <!-- Botão Principal Clicker (Terminal / Teclado) -->
+            <div class="relative flex justify-center items-center my-4 w-full max-w-[320px] aspect-square">
+                <!-- Anéis decorativos de efeito -->
+                <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-500/10 to-cyan-500/10 animate-ping duration-1000 pointer-events-none"></div>
+                
+                <button id="mainClickBtn" onclick="game.handleClick(event)" class="click-btn w-full h-full rounded-3xl bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-emerald-500/40 hover:border-emerald-400 flex flex-col items-center justify-center shadow-2xl relative group overflow-hidden focus:outline-none">
+                    <!-- Brilho no Hover -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-cyan-500/10 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                    
+                    <i class="fa-solid fa-terminal text-6xl text-emerald-400 mb-4 group-hover:scale-110 transition duration-200"></i>
+                    <span class="code-font text-xl font-bold text-slate-200 tracking-wider">&lt;ESCREVER/&gt;</span>
+                    <span class="text-xs text-emerald-400/80 font-mono mt-1">code(); // Clique aqui</span>
+                </button>
+            </div>
+
+            <!-- Terminal com Logs Flutuantes/Live Output -->
+            <div class="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 code-font text-xs text-slate-400 h-24 overflow-hidden flex flex-col justify-end shadow-inner">
+                <div id="consoleLogs" class="space-y-1">
+                    <p class="text-slate-500">// Terminal pronto. Comece a digitar código!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAINEL DA DIREITA: Loja de Upgrades & Contratações (Cols 4/12) -->
+        <section class="lg:col-span-4 flex flex-col bg-slate-800/80 backdrop-blur border border-slate-700/60 rounded-xl shadow-lg overflow-hidden h-[600px] lg:h-auto">
+            <!-- Cabeçalho de Abas da Loja -->
+            <div class="flex border-b border-slate-700 bg-slate-900/60 p-1">
+                <button id="tabCpcBtn" onclick="game.switchTab('cpc')" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg bg-slate-800 text-emerald-400 border border-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hand-pointer"></i> Equipamentos (CPC)
+                </button>
+                <button id="tabCpsBtn" onclick="game.switchTab('cps')" class="flex-1 py-2 text-xs font-bold uppercase rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-users-gear"></i> Equipe & IA (CPS)
+                </button>
+            </div>
+
+            <!-- Conteúdo das Abas da Loja -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="shopContainer">
+                <!-- Os itens de upgrade serão injetados dinamicamente via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900/90 border-t border-slate-800 py-3 text-center text-xs text-slate-500 z-10">
+        Dev Clicker - Desenvolvido para programadores &copy; 2026. Feito com HTML5 + JS Puro.
+    </footer>
+
+    <!-- EVENTO ESPECIAL FLUTUANTE (Cafeteira Dourada / Bug) -->
+    <div id="bonusEventBtn" onclick="game.handleBonusClick()" class="hidden fixed z-50 cursor-pointer p-4 rounded-full bg-amber-500/20 border-2 border-amber-400 glow-purple backdrop-blur bonus-event transition transform hover:scale-125">
+        <i id="bonusIcon" class="fa-solid fa-mug-hot text-3xl text-amber-400"></i>
+    </div>
+
+    <!-- CONTAINER DE NOTIFICAÇÕES (TOASTS) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        /**
+         * GERENCIADOR DE ÁUDIO SINTÉTICO (Web Audio API)
+         * Gera efeitos sonoros em tempo real sem arquivos de áudio externos
+         */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.05);
+
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playBuy() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            playAchievement() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(now + 0.5);
+            }
+        }
+
+        /**
+         * CLASSE PRINCIPAL DO JOGO DEV CLICKER
+         * Controla Estado, Renderização, Game Loop e Persistência
+         */
+        class DevClickerGame {
+            constructor() {
+                this.sound = new SoundFX();
+                this.activeTab = 'cpc'; // 'cpc' ou 'cps'
+
+                // Estado do Jogo
+                this.state = {
+                    loc: 0,
+                    totalLocEarned: 0,
+                    totalClicks: 0,
+                    multiplier: 1,
+                    multiplierTimer: 0,
+                    upgrades: {},
+                    achievements: {}
+                };
+
+                // Definições de Upgrades (Equipamentos CPC & Equipe CPS)
+                this.upgradeDefinitions = [
+                    // --- UPGRADES DE CLIQUE (CPC) ---
+                    { id: 'coffee', name: 'Café Forte', type: 'cpc', baseCost: 15, power: 1, icon: 'fa-mug-hot', desc: '+1 LOC por clique', count: 0 },
+                    { id: 'keyboard', name: 'Teclado Mecânico RGB', type: 'cpc', baseCost: 100, power: 5, icon: 'fa-keyboard', desc: '+5 LOC por clique', count: 0 },
+                    { id: 'monitor', name: 'Monitor Ultrawide 144Hz', type: 'cpc', baseCost: 500, power: 20, icon: 'fa-desktop', desc: '+20 LOC por clique', count: 0 },
+                    { id: 'chair', name: 'Cadeira Ergonômica Pro', type: 'cpc', baseCost: 2500, power: 100, icon: 'fa-chair', desc: '+100 LOC por clique', count: 0 },
+                    { id: 'fiber_internet', name: 'Fibra Óptica Dedicada', type: 'cpc', baseCost: 12000, power: 400, icon: 'fa-network-wired', desc: '+400 LOC por clique', count: 0 },
+
+                    // --- AUTOMAÇÕES / EQUIPE (CPS) ---
+                    { id: 'intern', name: 'Estagiário de Dev', type: 'cps', baseCost: 50, power: 1, icon: 'fa-user-graduate', desc: '+1 LOC/segundo', count: 0 },
+                    { id: 'junior_dev', name: 'Dev Junior', type: 'cps', baseCost: 350, power: 5, icon: 'fa-user-code', desc: '+5 LOC/segundo', count: 0 },
+                    { id: 'pleno_dev', name: 'Dev Pleno', type: 'cps', baseCost: 2000, power: 25, icon: 'fa-user-gear', desc: '+25 LOC/segundo', count: 0 },
+                    { id: 'senior_dev', name: 'Dev Senior', type: 'cps', baseCost: 10000, power: 100, icon: 'fa-user-ninja', desc: '+100 LOC/segundo', count: 0 },
+                    { id: 'architect', name: 'Arquiteto de Software', type: 'cps', baseCost: 50000, power: 500, icon: 'fa-sitemap', desc: '+500 LOC/segundo', count: 0 },
+                    { id: 'ai_copilot', name: 'IA Copilot Auto-Coder', type: 'cps', baseCost: 250000, power: 2000, icon: 'fa-robot', desc: '+2.000 LOC/segundo', count: 0 },
+                    { id: 'quantum_server', name: 'Servidor Quântico na Nuvem', type: 'cps', baseCost: 1000000, power: 10000, icon: 'fa-server', desc: '+10.000 LOC/segundo', count: 0 }
+                ];
+
+                // Definições de Conquistas (Achievements)
+                this.achievementDefinitions = [
+                    { id: 'first_click', title: 'Hello World!', desc: 'Escreva sua primeira linha de código.', reqType: 'totalLoc', reqVal: 1, icon: 'fa-terminal', unlocked: false },
+                    { id: 'loc_100', title: 'Script Simples', desc: 'Acumule 100 Linhas de Código.', reqType: 'totalLoc', reqVal: 100, icon: 'fa-code', unlocked: false },
+                    { id: 'first_hire', title: 'Primeiro Estagiário', desc: 'Contrate seu primeiro ajudante.', reqType: 'upgradeCount', upgradeId: 'intern', reqVal: 1, icon: 'fa-user-graduate', unlocked: false },
+                    { id: 'loc_10k', title: 'Fullstack Dev', desc: 'Alcance 10.000 Linhas de Código.', reqType: 'totalLoc', reqVal: 10000, icon: 'fa-layer-group', unlocked: false },
+                    { id: 'click_500', title: 'Síndrome do Túnel do Carpo', desc: 'Clique 500 vezes manualmente.', reqType: 'clicks', reqVal: 500, icon: 'fa-hand-pointer', unlocked: false },
+                    { id: 'ai_master', title: 'A Era das Máquinas', desc: 'Adquira a IA Copilot Auto-Coder.', reqType: 'upgradeCount', upgradeId: 'ai_copilot', reqVal: 1, icon: 'fa-robot', unlocked: false },
+                    { id: 'loc_1m', title: 'Mestre da Matrix', desc: 'Acumule 1 Milhão de Linhas de Código!', reqType: 'totalLoc', reqVal: 1000000, icon: 'fa-crown', unlocked: false }
+                ];
+
+                // Metas de progresso para a barra superior
+                this.goals = [100, 1000, 10000, 100000, 1000000, 10000000];
+
+                // Inicializar Upgrades no State
+                this.upgradeDefinitions.forEach(u => {
+                    this.state.upgrades[u.id] = 0;
+                });
+
+                // Inicializar Eventos Bônus
+                this.bonusActive = false;
+                this.bonusTimer = null;
+
+                this.init();
+            }
+
+            init() {
+                this.loadGame();
+                this.renderShop();
+                this.renderAchievements();
+                this.updateUI();
+
+                // Game Loop Principal (Atualização de CPS a cada 100ms)
+                let lastTime = Date.now();
+                setInterval(() => {
+                    const now = Date.now();
+                    const delta = (now - lastTime) / 1000;
+                    lastTime = now;
+
+                    this.gameLoop(delta);
+                }, 100);
+
+                // Auto-save a cada 15 segundos
+                setInterval(() => this.saveGame(false), 15000);
+
+                // Agendador de Eventos Aleatórios (a cada 30-60 segundos)
+                this.scheduleRandomEvent();
+            }
+
+            // Loop de atualização contínua
+            gameLoop(delta) {
+                const cps = this.calculateCPS();
+                if (cps > 0) {
+                    const earned = cps * delta * this.state.multiplier;
+                    this.state.loc += earned;
+                    this.state.totalLocEarned += earned;
+                }
+
+                // Decrementar temporizador de bônus
+                if (this.state.multiplierTimer > 0) {
+                    this.state.multiplierTimer -= delta;
+                    if (this.state.multiplierTimer <= 0) {
+                        this.state.multiplierTimer = 0;
+                        this.state.multiplier = 1;
+                        document.getElementById('multiplierBadge').classList.add('hidden');
+                        this.logConsole('Efeito do café energético expirou.');
+                    } else {
+                        document.getElementById('multiplierTimer').innerText = Math.ceil(this.state.multiplierTimer);
+                    }
+                }
+
+                this.checkAchievements();
+                this.updateUI();
+            }
+
+            // Cálculo dinâmico do CPC (Código Por Clique)
+            calculateCPC() {
+                let cpc = 1; // Base
+                this.upgradeDefinitions.filter(u => u.type === 'cpc').forEach(u => {
+                    cpc += u.power * (this.state.upgrades[u.id] || 0);
+                });
+                return cpc;
+            }
+
+            // Cálculo dinâmico do CPS (Código Por Segundo)
+            calculateCPS() {
+                let cps = 0;
+                this.upgradeDefinitions.filter(u => u.type === 'cps').forEach(u => {
+                    cps += u.power * (this.state.upgrades[u.id] || 0);
+                });
+                return cps;
+            }
+
+            // Cálculo exponencial do Custo do Upgrade
+            getUpgradeCost(upgrade) {
+                const count = this.state.upgrades[upgrade.id] || 0;
+                return Math.floor(upgrade.baseCost * Math.pow(1.15, count));
+            }
+
+            // Manipulador de clique principal
+            handleClick(event) {
+                const cpc = this.calculateCPC() * this.state.multiplier;
+                this.state.loc += cpc;
+                this.state.totalLocEarned += cpc;
+                this.state.totalClicks++;
+
+                // Áudio & Animação
+                this.sound.playClick();
+                this.createFloatingText(event, `+${this.formatNumber(cpc)} LOC`);
+
+                // Feedback visual aleatório no terminal log
+                if (Math.random() < 0.15) {
+                    const codeSnippets = [
+                        'console.log("Hello World");',
+                        'const dev = new Developer();',
+                        'git commit -m "Fix bug"',
+                        'npm run build',
+                        'return status == 200;'
+                    ];
+                    this.logConsole(codeSnippets[Math.floor(Math.random() * codeSnippets.length)]);
+                }
+
+                this.updateUI();
+            }
+
+            // Efeito de texto flutuante ao clicar (+LOC)
+            createFloatingText(event, text) {
+                const btn = document.getElementById('mainClickBtn');
+                const rect = btn.getBoundingClientRect();
+                
+                // Posição do clique ou centro do botão
+                const x = event ? event.clientX : rect.left + rect.width / 2;
+                const y = event ? event.clientY : rect.top + rect.height / 2;
+
+                const el = document.createElement('div');
+                el.className = 'floating-text code-font text-emerald-400 text-lg';
+                el.innerText = text;
+                el.style.left = `${x - 20 + (Math.random() * 20 - 10)}px`;
+                el.style.top = `${y - 30}px`;
+
+                document.body.appendChild(el);
+
+                setTimeout(() => el.remove(), 1000);
+            }
+
+            // Tentar comprar Upgrade
+            buyUpgrade(upgradeId) {
+                const upgrade = this.upgradeDefinitions.find(u => u.id === upgradeId);
+                if (!upgrade) return;
+
+                const cost = this.getUpgradeCost(upgrade);
+
+                if (this.state.loc >= cost) {
+                    this.state.loc -= cost;
+                    this.state.upgrades[upgradeId] = (this.state.upgrades[upgradeId] || 0) + 1;
+                    
+                    this.sound.playBuy();
+                    this.logConsole(`Comprado: ${upgrade.name} (Total: ${this.state.upgrades[upgradeId]})`);
+                    
+                    this.renderShop();
+                    this.updateUI();
+                } else {
+                    this.showToast('LOC insuficiente para comprar!', 'error');
+                }
+            }
+
+            // Agendar próxima aparição da Cafeteira Dourada/Bug
+            scheduleRandomEvent() {
+                const nextTime = Math.random() * 30000 + 30000; // 30s a 60s
+                setTimeout(() => {
+                    this.spawnBonusEvent();
+                    this.scheduleRandomEvent();
+                }, nextTime);
+            }
+
+            spawnBonusEvent() {
+                if (this.bonusActive) return;
+
+                const btn = document.getElementById('bonusEventBtn');
+                const icon = document.getElementById('bonusIcon');
+
+                // 70% Cafeteira (Bônus Multiplicador x2), 30% Bug Crítico (Insta-LOC)
+                const isCoffee = Math.random() < 0.7;
+                this.currentBonusType = isCoffee ? 'multiplier' : 'instant';
+
+                if (isCoffee) {
+                    icon.className = "fa-solid fa-mug-hot text-3xl text-amber-400";
+                    btn.title = "Café Expresso! Clique para 2x LOC por 15s!";
+                } else {
+                    icon.className = "fa-solid fa-bug text-3xl text-red-400";
+                    btn.title = "Bug Crítico Encontrado! Clique para recompensa em LOC!";
+                }
+
+                // Posição aleatória no ecrã
+                const maxX = window.innerWidth - 100;
+                const maxY = window.innerHeight - 100;
+                btn.style.left = `${Math.max(20, Math.random() * maxX)}px`;
+                btn.style.top = `${Math.max(80, Math.random() * maxY)}px`;
+
+                btn.classList.remove('hidden');
+                this.bonusActive = true;
+
+                // Desaparecer após 8 segundos se não for clicado
+                this.bonusTimer = setTimeout(() => {
+                    this.hideBonusEvent();
+                }, 8000);
+            }
+
+            hideBonusEvent() {
+                const btn = document.getElementById('bonusEventBtn');
+                btn.classList.add('hidden');
+                this.bonusActive = false;
+                if (this.bonusTimer) clearTimeout(this.bonusTimer);
+            }
+
+            handleBonusClick() {
+                if (!this.bonusActive) return;
+
+                this.sound.playAchievement();
+
+                if (this.currentBonusType === 'multiplier') {
+                    this.state.multiplier = 2;
+                    this.state.multiplierTimer = 15; // 15 segundos
+                    document.getElementById('multiplierBadge').classList.remove('hidden');
+                    this.showToast('BÔNUS! Produção de LOC Dobrada (2x) por 15s!', 'success');
+                    this.logConsole('Café energético tomado: Produção dobrada!');
+                } else {
+                    // Ganho instantâneo proporcional ao CPS ou valor fixo mínimo
+                    const reward = Math.max(50, Math.floor(this.calculateCPS() * 30 + 20));
+                    this.state.loc += reward;
+                    this.state.totalLocEarned += reward;
+                    this.showToast(`BUG CORRIGIDO! Você ganhou +${this.formatNumber(reward)} LOC!`, 'success');
+                    this.logConsole(`Bug crítico resolvido! +${this.formatNumber(reward)} LOC adicionadas.`);
+                }
+
+                this.hideBonusEvent();
+                this.updateUI();
+            }
+
+            checkAchievements() {
+                this.achievementDefinitions.forEach(ach => {
+                    if (this.state.achievements[ach.id]) return; // Já desbloqueada
+
+                    let unlocked = false;
+
+                    if (ach.reqType === 'totalLoc' && this.state.totalLocEarned >= ach.reqVal) {
+                        unlocked = true;
+                    } else if (ach.reqType === 'clicks' && this.state.totalClicks >= ach.reqVal) {
+                        unlocked = true;
+                    } else if (ach.reqType === 'upgradeCount') {
+                        if ((this.state.upgrades[ach.upgradeId] || 0) >= ach.reqVal) {
+                            unlocked = true;
+                        }
+                    }
+
+                    if (unlocked) {
+                        this.state.achievements[ach.id] = true;
+                        this.sound.playAchievement();
+                        this.showToast(`Conquista Desbloqueada: ${ach.title}!`, 'achievement');
+                        this.logConsole(`CONQUISTA: [${ach.title}] - ${ach.desc}`);
+                        this.renderAchievements();
+                    }
+                });
+            }
+
+            updateUI() {
+                // Atualizar Displays Numéricos
+                document.getElementById('locDisplay').innerText = this.formatNumber(Math.floor(this.state.loc));
+                document.getElementById('cpsDisplay').innerText = this.formatNumber(this.calculateCPS() * this.state.multiplier, true);
+                document.getElementById('cpcDisplay').innerText = this.formatNumber(this.calculateCPC() * this.state.multiplier, true);
+
+                // Progresso de Metas
+                this.updateProgressBar();
+
+                // Habilitar/Desabilitar botões da loja dinamicamente pelo custo
+                this.upgradeDefinitions.forEach(upgrade => {
+                    const card = document.getElementById(`upgrade-card-${upgrade.id}`);
+                    if (card) {
+                        const cost = this.getUpgradeCost(upgrade);
+                        const btn = card.querySelector('button');
+                        if (this.state.loc >= cost) {
+                            card.classList.remove('opacity-50', 'grayscale');
+                            if (btn) btn.disabled = false;
+                        } else {
+                            card.classList.add('opacity-50');
+                            if (btn) btn.disabled = true;
+                        }
+                    }
+                });
+            }
+
+            updateProgressBar() {
+                const currentGoal = this.goals.find(g => g > this.state.totalLocEarned) || this.goals[this.goals.length - 1];
+                const prevGoal = this.goals[this.goals.indexOf(currentGoal) - 1] || 0;
+                
+                const progress = Math.min(100, Math.max(0, ((this.state.totalLocEarned - prevGoal) / (currentGoal - prevGoal)) * 100));
+                
+                document.getElementById('goalProgressBar').style.width = `${progress}%`;
+                document.getElementById('nextGoalPercent').innerText = `${Math.floor(progress)}%`;
+                document.getElementById('nextGoalText').innerText = `Próxima Meta: ${this.formatNumber(currentGoal)} LOC`;
+            }
+
+            renderShop() {
+                const container = document.getElementById('shopContainer');
+                container.innerHTML = '';
+
+                const filteredUpgrades = this.upgradeDefinitions.filter(u => u.type === this.activeTab);
+
+                filteredUpgrades.forEach(upgrade => {
+                    const count = this.state.upgrades[upgrade.id] || 0;
+                    const cost = this.getUpgradeCost(upgrade);
+                    const canAfford = this.state.loc >= cost;
+
+                    const card = document.createElement('div');
+                    card.id = `upgrade-card-${upgrade.id}`;
+                    card.className = `p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between gap-3 transition ${canAfford ? '' : 'opacity-50'}`;
+
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-emerald-400 border border-slate-700">
+                                <i class="fa-solid ${upgrade.icon} text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-sm text-slate-200">${upgrade.name}</h4>
+                                    <span class="text-xs code-font font-semibold px-1.5 py-0.2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">x${count}</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">${upgrade.desc}</p>
+                            </div>
+                        </div>
+                        <button onclick="game.buyUpgrade('${upgrade.id}')" ${canAfford ? '' : 'disabled'} class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs code-font transition flex flex-col items-center min-w-[90px]">
+                            <span>COMPRAR</span>
+                            <span class="text-[10px] opacity-90">${this.formatNumber(cost)} LOC</span>
+                        </button>
+                    `;
+
+                    container.appendChild(card);
+                });
+            }
+
+            renderAchievements() {
+                const container = document.getElementById('achievementsContainer');
+                container.innerHTML = '';
+
+                let unlockedCount = 0;
+
+                this.achievementDefinitions.forEach(ach => {
+                    const isUnlocked = !!this.state.achievements[ach.id];
+                    if (isUnlocked) unlockedCount++;
+
+                    const item = document.createElement('div');
+                    item.className = `p-2.5 rounded-lg border text-xs flex items-center gap-3 transition ${isUnlocked ? 'bg-amber-500/10 border-amber-500/30 text-slate-200' : 'bg-slate-900/40 border-slate-800 text-slate-500 grayscale opacity-60'}`;
+
+                    item.innerHTML = `
+                        <div class="w-8 h-8 rounded-full ${isUnlocked ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-600'} flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid ${ach.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold ${isUnlocked ? 'text-amber-300' : 'text-slate-400'}">${ach.title}</div>
+                            <div class="text-[11px] text-slate-400">${ach.desc}</div>
+                        </div>
+                        ${isUnlocked ? '<i class="fa-solid fa-check text-emerald-400 mr-1"></i>' : ''}
+                    `;
+
+                    container.appendChild(item);
+                });
+
+                document.getElementById('achievementRatio').innerText = `${unlockedCount}/${this.achievementDefinitions.length}`;
+            }
+
+            switchTab(tab) {
+                this.activeTab = tab;
+                const cpcBtn = document.getElementById('tabCpcBtn');
+                const cpsBtn = document.getElementById('tabCpsBtn');
+
+                if (tab === 'cpc') {
+                    cpcBtn.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg bg-slate-800 text-emerald-400 border border-slate-700 transition flex items-center justify-center gap-2";
+                    cpsBtn.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2";
+                } else {
+                    cpsBtn.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg bg-slate-800 text-emerald-400 border border-slate-700 transition flex items-center justify-center gap-2";
+                    cpcBtn.className = "flex-1 py-2 text-xs font-bold uppercase rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2";
+                }
+
+                this.renderShop();
+            }
+
+            logConsole(text) {
+                const logs = document.getElementById('consoleLogs');
+                const time = new Date().toLocaleTimeString().split(' ')[0];
+                const p = document.createElement('p');
+                p.className = "text-slate-300 truncate";
+                p.innerHTML = `<span class="text-slate-500">[${time}]</span> ${text}`;
+                logs.appendChild(p);
+
+                // Manter máximo de 4 mensagens no log do terminal
+                while (logs.children.length > 4) {
+                    logs.removeChild(logs.firstChild);
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+
+                let bgColor = "bg-slate-800 border-slate-700 text-slate-200";
+                let icon = "fa-circle-info text-cyan-400";
+
+                if (type === 'success') {
+                    bgColor = "bg-emerald-950/90 border-emerald-500/50 text-emerald-200";
+                    icon = "fa-circle-check text-emerald-400";
+                } else if (type === 'error') {
+                    bgColor = "bg-red-950/90 border-red-500/50 text-red-200";
+                    icon = "fa-circle-xmark text-red-400";
+                } else if (type === 'achievement') {
+                    bgColor = "bg-amber-950/90 border-amber-500/50 text-amber-200";
+                    icon = "fa-trophy text-amber-400";
+                }
+
+                toast.className = `p-3 rounded-xl border backdrop-blur shadow-2xl flex items-center gap-3 text-xs font-medium ${bgColor} transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto max-w-sm`;
+                toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i> <span>${message}</span>`;
+
+                container.appendChild(toast);
+
+                // Animar entrada e saída
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-4', 'opacity-0');
+                }, 10);
+
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+
+            toggleSound() {
+                this.sound.enabled = !this.sound.enabled;
+                const icon = document.getElementById('soundIcon');
+                const text = document.getElementById('soundText');
+
+                if (this.sound.enabled) {
+                    icon.className = "fa-solid fa-volume-high text-emerald-400";
+                    text.innerText = "Som: LIGADO";
+                } else {
+                    icon.className = "fa-solid fa-volume-xmark text-slate-500";
+                    text.innerText = "Som: DESLIGADO";
+                }
+            }
+
+            // Formatação de Números Grandes (K, M, B, T)
+            formatNumber(num, decimal = false) {
+                if (num < 1000) return decimal ? num.toFixed(1) : Math.floor(num).toString();
+                const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi"];
+                const i = Math.floor(Math.log10(num) / 3);
+                const formatted = (num / Math.pow(10, i * 3)).toFixed(2);
+                return `${formatted} ${suffixes[i]}`;
+            }
+
+            // Salvar no LocalStorage
+            saveGame(manual = false) {
+                try {
+                    localStorage.setItem('dev_clicker_save', JSON.stringify(this.state));
+                    if (manual) {
+                        this.showToast('Progresso salvo com sucesso!', 'success');
+                    }
+                } catch (e) {
+                    console.error("Erro ao salvar progresso", e);
+                }
+            }
+
+            // Carregar do LocalStorage
+            loadGame() {
+                try {
+                    const saved = localStorage.getItem('dev_clicker_save');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        this.state = { ...this.state, ...parsed };
+                        this.logConsole('Progresso anterior carregado com sucesso!');
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar dados salvos", e);
+                }
+            }
+
+            // Reset do Jogo
+            confirmReset() {
+                if (window.confirm("Tem certeza que deseja reiniciar todo o seu progresso no Dev Clicker?")) {
+                    localStorage.removeItem('dev_clicker_save');
+                    window.location.reload();
+                }
+            }
+        }
+
+        let game;
+        window.addEventListener('DOMContentLoaded', () => {
+            game = new DevClickerGame();
+        });
+    </script>
+</body>
+</html>

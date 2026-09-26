@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Clicker Extended - Pro Edition</title>
-    <!-- Tailwind CSS CDN para layout e utilitários -->
+    <title>Dev Typist Pro - Multi-Language Edition</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome para ícones -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Fontes Fira Code e Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* DEFINIÇÃO DE TEMAS COM VARIÁVEIS CSS */
+        /* TEMAS VISUAIS VIA VARIÁVEIS CSS */
         :root[data-theme="vscode"] {
             --bg-dark: #0f172a;
             --panel-bg: #1e293b;
@@ -27,7 +27,6 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --code-bg: #090d16;
-            --btn-click-bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
 
         :root[data-theme="matrix"] {
@@ -42,7 +41,6 @@
             --text-main: #00ff66;
             --text-muted: #16a34a;
             --code-bg: #010603;
-            --btn-click-bg: linear-gradient(135deg, #052312 0%, #020b05 100%);
         }
 
         :root[data-theme="cyberpunk"] {
@@ -57,22 +55,6 @@
             --text-main: #fef08a;
             --text-muted: #a1a1aa;
             --code-bg: #09050d;
-            --btn-click-bg: linear-gradient(135deg, #2a1836 0%, #120e17 100%);
-        }
-
-        :root[data-theme="light"] {
-            --bg-dark: #f1f5f9;
-            --panel-bg: #ffffff;
-            --panel-border: #cbd5e1;
-            --accent-primary: #059669;
-            --accent-secondary: #0891b2;
-            --accent-purple: #7c3aed;
-            --accent-amber: #d97706;
-            --accent-red: #dc2626;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --code-bg: #e2e8f0;
-            --btn-click-bg: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
         }
 
         :root[data-theme="synthwave"] {
@@ -87,7 +69,20 @@
             --text-main: #ffe5f1;
             --text-muted: #b892ff;
             --code-bg: #100520;
-            --btn-click-bg: linear-gradient(135deg, #37185e 0%, #1a0b2e 100%);
+        }
+
+        :root[data-theme="monokai"] {
+            --bg-dark: #272822;
+            --panel-bg: #1e1f1c;
+            --panel-border: #49483e;
+            --accent-primary: #a6e22e;
+            --accent-secondary: #66d9ef;
+            --accent-purple: #ae81ff;
+            --accent-amber: #e6db74;
+            --accent-red: #f92672;
+            --text-main: #f8f8f2;
+            --text-muted: #75715e;
+            --code-bg: #171814;
         }
 
         body {
@@ -99,113 +94,68 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .code-font {
-            font-family: 'Fira Code', monospace;
-        }
-
-        .panel-style {
-            background-color: var(--panel-bg);
-            border-color: var(--panel-border);
-        }
-
+        .code-font { font-family: 'Fira Code', monospace; }
+        .panel-style { background-color: var(--panel-bg); border-color: var(--panel-border); }
         .text-accent-p { color: var(--accent-primary); }
         .text-accent-s { color: var(--accent-secondary); }
         .text-accent-purp { color: var(--accent-purple); }
         .text-accent-amb { color: var(--accent-amber); }
         .text-accent-err { color: var(--accent-red); }
 
-        .bg-accent-p { background-color: var(--accent-primary); }
-        .border-accent-p { border-color: var(--accent-primary); }
+        /* Scrollbar customizado */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--code-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 4px; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--code-bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--panel-border);
-            border-radius: 4px;
-        }
-
-        /* Efeitos de Animação e Interação */
-        .click-btn {
-            background: var(--btn-click-bg);
-            border-color: var(--accent-primary);
-            transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .click-btn:active {
-            transform: scale(0.93);
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
-        }
-
-        .floating-text {
-            position: absolute;
-            pointer-events: none;
-            animation: floatUp 0.9s ease-out forwards;
-            font-weight: 800;
-            z-index: 50;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
-        }
-        .pulse-bg {
-            animation: pulseGlow 2s infinite;
-        }
-
+        /* Scanlines Retro Effect */
         .scanline {
             background: linear-gradient(
                 to bottom,
                 rgba(255,255,255,0),
                 rgba(255,255,255,0) 50%,
-                rgba(0, 0, 0, 0.2) 50%,
-                rgba(0, 0, 0, 0.2)
+                rgba(0, 0, 0, 0.15) 50%,
+                rgba(0, 0, 0, 0.15)
             );
             background-size: 100% 4px;
             pointer-events: none;
         }
 
-        .typing-correct {
-            color: var(--accent-primary);
-            font-weight: bold;
-        }
-        .typing-wrong {
-            background-color: rgba(239, 68, 68, 0.3);
-            color: var(--accent-red);
-            text-decoration: underline;
-        }
-        .typing-pending {
-            color: var(--text-muted);
-            opacity: 0.6;
-        }
+        /* Animações e Estilos de Digitação */
+        .typing-correct { color: var(--accent-primary); font-weight: bold; }
+        .typing-wrong { background-color: rgba(239, 68, 68, 0.3); color: var(--accent-red); text-decoration: underline; }
+        .typing-pending { color: var(--text-muted); opacity: 0.6; }
+        
         .cursor-blink {
             display: inline-block;
-            width: 8px;
-            height: 1.1em;
+            width: 9px;
+            height: 1.2em;
             background-color: var(--accent-primary);
             vertical-align: middle;
             animation: blink 0.8s infinite;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.85); }
+        }
+
+        .floating-text {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            font-weight: 800;
+            z-index: 50;
         }
     </style>
 </head>
-<body data-theme="vscode" class="min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+<body data-theme="vscode" class="min-h-screen flex flex-col justify-between relative">
     <div class="scanline fixed inset-0 z-40"></div>
 
+    <!-- HEADER / BARRA SUPERIOR -->
     <header class="panel-style border-b px-4 py-3 sticky top-0 z-30 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <!-- LOGO -->
             <div class="flex items-center gap-3">
                 <div class="flex gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
@@ -213,37 +163,52 @@
                     <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
                 </div>
                 <h1 class="text-xl font-bold code-font tracking-wide flex items-center gap-2">
-                    <i class="fa-solid fa-code text-accent-p"></i>
-                    <span>Dev<span class="text-accent-p">Clicker</span>.ext</span>
+                    <i class="fa-solid fa-keyboard text-accent-p"></i>
+                    <span>Dev<span class="text-accent-p">Typist</span>.pro</span>
                 </h1>
-                <span class="text-xs px-2 py-0.5 rounded bg-black/30 border border-white/10 hidden sm:inline-block text-accent-s font-mono">PRO v2.0</span>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-black/40 border border-white/10 hidden sm:inline-block text-accent-s font-mono">100% TYPING</span>
             </div>
 
-            <!-- Seletor de Temas e Controles -->
+            <!-- CONTROLES (IDIOMA, TEMA, SOM, SAVE, RESET) -->
             <div class="flex items-center flex-wrap gap-2">
+                <!-- Seletor de Idioma (i18n) -->
+                <div class="flex items-center gap-1.5 bg-black/30 p-1 rounded-lg border border-white/10">
+                    <i class="fa-solid fa-globe text-xs px-1 text-accent-s"></i>
+                    <select id="langSelect" onchange="game.setLanguage(this.value)" class="bg-transparent text-xs font-bold focus:outline-none cursor-pointer">
+                        <option value="pt" class="bg-slate-900 text-white">Português 🇧🇷</option>
+                        <option value="en" class="bg-slate-900 text-white">English 🇺🇸</option>
+                        <option value="es" class="bg-slate-900 text-white">Español 🇪🇸</option>
+                    </select>
+                </div>
+
                 <!-- Seletor de Tema -->
-                <div class="flex items-center gap-1.5 bg-black/20 p-1 rounded-lg border border-white/10">
+                <div class="flex items-center gap-1.5 bg-black/30 p-1 rounded-lg border border-white/10">
                     <i class="fa-solid fa-palette text-xs px-1 text-accent-amb"></i>
                     <select id="themeSelect" onchange="game.changeTheme(this.value)" class="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer">
                         <option value="vscode" class="bg-slate-900 text-white">VS Code Dark</option>
                         <option value="matrix" class="bg-slate-900 text-white">Matrix Green</option>
                         <option value="cyberpunk" class="bg-slate-900 text-white">Cyberpunk 2077</option>
                         <option value="synthwave" class="bg-slate-900 text-white">Synthwave '84</option>
-                        <option value="light" class="bg-slate-100 text-black">Light Mode</option>
+                        <option value="monokai" class="bg-slate-900 text-white">Monokai Pro</option>
                     </select>
                 </div>
 
-                <button id="soundToggleBtn" onclick="game.toggleSound()" class="px-3 py-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-xs font-semibold flex items-center gap-2 border border-white/10 transition">
+                <!-- Alternar Som -->
+                <button id="soundToggleBtn" onclick="game.toggleSound()" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
                     <i id="soundIcon" class="fa-solid fa-volume-high text-accent-p"></i>
                     <span id="soundText" class="hidden md:inline">Som: ON</span>
                 </button>
-                <button onclick="game.saveGame(true)" class="px-3 py-1.5 rounded-lg bg-black/20 hover:bg-black/40 text-xs font-semibold flex items-center gap-2 border border-white/10 transition">
+
+                <!-- Salvar -->
+                <button onclick="game.saveGame(true)" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
                     <i class="fa-solid fa-floppy-disk text-accent-s"></i>
-                    <span class="hidden md:inline">Salvar</span>
+                    <span data-i18n="saveBtn" class="hidden md:inline">Salvar</span>
                 </button>
-                <button onclick="game.confirmReset()" class="px-3 py-1.5 rounded-lg bg-black/20 hover:bg-red-900/40 text-red-400 text-xs font-semibold flex items-center gap-2 border border-white/10 transition">
+
+                <!-- Reset -->
+                <button onclick="game.confirmReset()" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-red-900/40 text-red-400 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
                     <i class="fa-solid fa-rotate-left"></i>
-                    <span class="hidden md:inline">Reset</span>
+                    <span data-i18n="resetBtn" class="hidden md:inline">Reset</span>
                 </button>
             </div>
         </div>
@@ -251,57 +216,51 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-5 z-10">
 
-        <!-- PAINEL DA ESQUERDA: Métricas & Desafios Ativos (Cols 3/12) -->
+        <!-- PAINEL ESQUERDO: ESTATÍSTICAS E CONQUISTAS (Cols 3/12) -->
         <section class="lg:col-span-3 flex flex-col gap-4">
-            <!-- Stats Principais -->
+            <!-- Painel de Performance -->
             <div class="panel-style border rounded-xl p-4 shadow-md flex flex-col gap-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 border-b border-white/10 pb-2 text-accent-s">
-                    <i class="fa-solid fa-chart-line"></i> Performance Dev
+                    <i class="fa-solid fa-chart-line"></i> <span data-i18n="devPerformance">Desempenho Dev</span>
                 </h2>
 
                 <div>
-                    <span class="text-[11px] opacity-75 uppercase font-medium">Linhas por Segundo (CPS)</span>
+                    <span class="text-[10px] opacity-75 uppercase font-medium" data-i18n="cpsLabel">Linhas/seg (CPS)</span>
                     <div class="text-xl font-bold code-font text-accent-s" id="cpsDisplay">0.0</div>
                 </div>
 
                 <div>
-                    <span class="text-[11px] opacity-75 uppercase font-medium">Linhas por Clique (CPC)</span>
-                    <div class="text-xl font-bold code-font text-accent-purp" id="cpcDisplay">1.0</div>
+                    <span class="text-[10px] opacity-75 uppercase font-medium" data-i18n="typingSpeedLabel">Velocidade (WPM / CPM)</span>
+                    <div class="text-lg font-bold code-font text-accent-amb" id="typingSpeedDisplay">0 WPM / 0 CPM</div>
                 </div>
 
                 <div>
-                    <span class="text-[11px] opacity-75 uppercase font-medium">Velocidade Digitação (WPM / CPM)</span>
-                    <div class="text-xl font-bold code-font text-accent-amb" id="typingSpeedDisplay">0 WPM / 0 CPM</div>
-                </div>
-
-                <div>
-                    <span class="text-[11px] opacity-75 uppercase font-medium">Multiplicador Global</span>
-                    <div class="text-xl font-bold code-font text-accent-p" id="globalMultiplierDisplay">1.0x</div>
+                    <span class="text-[10px] opacity-75 uppercase font-medium" data-i18n="globalMultiplierLabel">Multiplicador Global</span>
+                    <div class="text-lg font-bold code-font text-accent-p" id="globalMultiplierDisplay">1.0x</div>
                 </div>
 
                 <div class="pt-2 border-t border-white/10">
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="opacity-75">Progresso Nível/Meta</span>
+                        <span class="opacity-75" data-i18n="nextGoalLabel">Próxima Meta</span>
                         <span id="nextGoalPercent" class="code-font text-accent-p">0%</span>
                     </div>
                     <div class="w-full bg-black/40 rounded-full h-2 overflow-hidden border border-white/10">
                         <div id="goalProgressBar" class="bg-accent-p h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
-                    <p id="nextGoalText" class="text-[10px] opacity-70 mt-1 italic text-right">Próxima meta: 100 LOC</p>
+                    <p id="nextGoalText" class="text-[10px] opacity-70 mt-1 italic text-right">Meta: 100 LOC</p>
                 </div>
             </div>
 
-            <!-- Painel de Desafios & Status do Servidor -->
-            <div id="serverStatusCard" class="panel-style border rounded-xl p-4 shadow-md flex flex-col gap-2 relative overflow-hidden">
+            <!-- Painel de Servidor / Evento -->
+            <div id="serverStatusCard" class="panel-style border rounded-xl p-4 shadow-md flex flex-col gap-2">
                 <h2 class="text-xs font-bold uppercase tracking-wider flex items-center justify-between border-b border-white/10 pb-2">
-                    <span class="flex items-center gap-2 text-accent-p"><i class="fa-solid fa-server"></i> Servidor</span>
+                    <span class="flex items-center gap-2 text-accent-p"><i class="fa-solid fa-server"></i> <span data-i18n="serverTitle">Servidor</span></span>
                     <span id="serverStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ONLINE</span>
                 </h2>
-                <p id="serverStatusText" class="text-xs opacity-80">Sistemas operando em 100% de capacidade.</p>
+                <p id="serverStatusText" class="text-xs opacity-80" data-i18n="serverOk">Sistemas operando normalmente em 100%.</p>
                 
-                <!-- Botão de Restauro emergencial (escondido por padrão) -->
                 <button id="fixServerBtn" onclick="game.resolveServerOutage()" class="hidden mt-2 w-full py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-lg shadow animate-bounce transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation"></i> DEPLOY FIX DE EMERGÊNCIA
+                    <i class="fa-solid fa-wrench"></i> <span data-i18n="fixServerBtn">DEPLOY DE EMERGÊNCIA</span>
                 </button>
             </div>
 
@@ -309,107 +268,95 @@
             <div class="panel-style border rounded-xl p-4 shadow-md flex-1 flex flex-col min-h-[180px]">
                 <div class="flex justify-between items-center border-b border-white/10 pb-2 mb-2">
                     <h2 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-accent-amb">
-                        <i class="fa-solid fa-trophy"></i> Conquistas
+                        <i class="fa-solid fa-trophy"></i> <span data-i18n="achievementsTitle">Conquistas</span>
                     </h2>
-                    <span id="achievementRatio" class="text-xs code-font px-2 py-0.5 rounded bg-black/30 text-accent-amb font-bold">0/0</span>
+                    <span id="achievementRatio" class="text-xs code-font px-2 py-0.5 rounded bg-black/40 text-accent-amb font-bold">0/0</span>
                 </div>
-                <div id="achievementsContainer" class="flex-1 overflow-y-auto max-h-[200px] space-y-2 pr-1">
-                    <!-- Conquistas inseridas dinamicamente -->
+                <div id="achievementsContainer" class="flex-1 overflow-y-auto max-h-[220px] space-y-2 pr-1">
+                    <!-- Conquistas inseridas via JS -->
                 </div>
             </div>
         </section>
 
-        <!-- PAINEL CENTRAL: Área de Digitação & Clique (Cols 5/12) -->
+        <!-- PAINEL CENTRAL: TERMINAL E ÁREA DE DIGITAÇÃO (Cols 5/12) -->
         <section class="lg:col-span-5 flex flex-col items-center gap-4">
             <!-- Header LOC Total -->
-            <div class="text-center w-full panel-style p-4 rounded-2xl border backdrop-blur relative overflow-hidden">
-                <span class="text-[10px] font-semibold opacity-70 uppercase tracking-widest block mb-1">Linhas de Código Totais (LOC)</span>
-                <div class="text-3xl sm:text-4xl font-black code-font text-accent-p tracking-tight py-2 rounded-xl bg-black/40 border border-white/10" id="locDisplay">
+            <div class="text-center w-full panel-style p-4 rounded-2xl border relative overflow-hidden shadow-lg">
+                <span class="text-[10px] font-semibold opacity-70 uppercase tracking-widest block mb-1" data-i18n="locTotalLabel">Linhas Totais de Código (LOC)</span>
+                <div class="text-3xl sm:text-4xl font-black code-font text-accent-p tracking-tight py-2 rounded-xl bg-black/40 border border-white/10 shadow-inner" id="locDisplay">
                     0
                 </div>
                 <div class="flex justify-between items-center mt-2 px-2 text-xs opacity-80">
-                    <span>Combo Digitação: <strong id="comboDisplay" class="text-accent-amb">x1.0</strong></span>
-                    <span>Linhas Concluídas: <strong id="linesCompletedDisplay" class="text-accent-s">0</strong></span>
+                    <span><span data-i18n="comboLabel">Combo Digitação</span>: <strong id="comboDisplay" class="text-accent-amb">x1.0</strong></span>
+                    <span><span data-i18n="linesCompletedLabel">Linhas Concluídas</span>: <strong id="linesCompletedDisplay" class="text-accent-s">0</strong></span>
                 </div>
             </div>
 
-            <!-- MODO DIGITAÇÃO DE CÓDIGO (TYPING CHALLENGE) -->
+            <!-- TERMINAL DE DIGITAÇÃO -->
             <div class="w-full panel-style border rounded-2xl p-4 shadow-xl flex flex-col gap-3 relative">
                 <div class="flex justify-between items-center border-b border-white/10 pb-2">
                     <span class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-accent-p">
-                        <i class="fa-solid fa-keyboard"></i> Modo Digitação de Código
+                        <i class="fa-solid fa-terminal"></i> <span data-i18n="typingTerminalTitle">Terminal de Código</span>
                     </span>
-                    <span id="typingLangBadge" class="text-[10px] code-font font-bold px-2 py-0.5 rounded bg-black/40 border border-white/10 text-accent-s">JavaScript</span>
+                    <span id="typingLangBadge" class="text-[10px] code-font font-bold px-2.5 py-0.5 rounded bg-black/50 border border-white/10 text-accent-s">JavaScript</span>
                 </div>
 
-                <!-- Display do Código para digitar -->
-                <div class="w-full bg-black/60 border border-white/10 rounded-xl p-4 code-font text-sm leading-relaxed min-h-[90px] flex items-center justify-center text-center relative overflow-hidden">
+                <!-- Snippet Alvo para Digitar (Sempre em Inglês) -->
+                <div class="w-full bg-black/70 border border-white/10 rounded-xl p-4 code-font text-sm leading-relaxed min-h-[90px] flex items-center justify-center text-center relative overflow-hidden shadow-inner">
                     <div id="codeSnippetTarget" class="break-all tracking-wide">
-                        <!-- O snippet de código será inserido aqui com destaque de caractere -->
+                        <!-- Código gerado dinamicamente -->
                     </div>
                 </div>
 
-                <!-- Campo de Entrada / Digitação -->
+                <!-- Input Transparente de Digitação -->
                 <div class="relative w-full">
-                    <input type="text" id="typingInput" oninput="game.handleTypingInput(this.value)" placeholder="Digite o código acima exatamente aqui..." autocomplete="off" spellcheck="false" class="w-full bg-black/40 border border-white/20 focus:border-emerald-500 rounded-xl px-4 py-2.5 code-font text-sm focus:outline-none transition">
-                    <button onclick="game.skipSnippet()" title="Pular linha (Perde combo)" class="absolute right-2 top-2 px-2 py-1 bg-white/5 hover:bg-white/10 text-xs text-muted rounded">
+                    <input type="text" id="typingInput" oninput="game.handleTypingInput(this.value)" autocomplete="off" spellcheck="false" class="w-full bg-black/50 border border-white/20 focus:border-emerald-500 rounded-xl px-4 py-2.5 code-font text-sm focus:outline-none transition shadow-inner">
+                    <button onclick="game.skipSnippet()" title="Pular linha" class="absolute right-2 top-2 px-2.5 py-1 bg-white/5 hover:bg-white/15 text-xs text-muted rounded border border-white/10 transition">
                         <i class="fa-solid fa-forward"></i>
                     </button>
                 </div>
-                <div class="text-[11px] opacity-60 text-center">
-                    Dica: Cada tecla correta dá bônus. Linha completa concede um grande pacote de LOC!
+                <div class="text-[11px] opacity-60 text-center" data-i18n="typingHint">
+                    💡 Digite o código exatamente como exibido acima. Cada caractere dá LOC com base no seu combo!
                 </div>
             </div>
 
-            <!-- BOTÃO PRINCIPAL DE CLIQUE -->
-            <div class="relative flex flex-col justify-center items-center w-full my-1">
-                <button id="mainClickBtn" onclick="game.handleClick(event)" class="click-btn w-full py-6 rounded-2xl border-2 flex flex-col items-center justify-center shadow-2xl relative group overflow-hidden focus:outline-none">
-                    <i class="fa-solid fa-terminal text-4xl text-accent-p mb-2 group-hover:scale-110 transition duration-200"></i>
-                    <span class="code-font text-lg font-bold tracking-wider">&lt;ESCREVER CÓDIGO/&gt;</span>
-                    <span class="text-xs opacity-70 font-mono mt-0.5">Clique manual // +<span id="clickPowerText">1</span> LOC</span>
-                </button>
-            </div>
-
             <!-- TERMINAL LOGS -->
-            <div class="w-full bg-black/70 border border-white/10 rounded-xl p-3 code-font text-xs opacity-80 h-20 overflow-hidden flex flex-col justify-end shadow-inner">
+            <div class="w-full bg-black/70 border border-white/10 rounded-xl p-3 code-font text-xs opacity-80 h-24 overflow-hidden flex flex-col justify-end shadow-inner">
                 <div id="consoleLogs" class="space-y-1">
-                    <p class="opacity-50">// Dev Terminal inicializado. Pronto para codificar.</p>
+                    <p class="opacity-50">// System initialized. Ready to compile code.</p>
                 </div>
             </div>
         </section>
 
-        <!-- PAINEL DA DIREITA: Loja de Upgrades & Multiplicadores (Cols 4/12) -->
+        <!-- PAINEL DIREITO: LOJA DE UPGRADES (Cols 4/12) -->
         <section class="lg:col-span-4 flex flex-col panel-style border rounded-xl shadow-lg overflow-hidden h-[620px] lg:h-auto">
-            <!-- Controles de Compra em Lote (x1, x10, x100, MAX) -->
-            <div class="bg-black/30 p-2 border-b border-white/10 flex justify-between items-center gap-1">
-                <span class="text-[11px] font-bold uppercase opacity-80 px-2">Lote:</span>
+            <!-- Seletor de Lote (x1, x10, x100, MAX) -->
+            <div class="bg-black/40 p-2 border-b border-white/10 flex justify-between items-center gap-1">
+                <span class="text-[11px] font-bold uppercase opacity-80 px-2" data-i18n="buyAmountLabel">Lote:</span>
                 <div class="flex gap-1 flex-1">
-                    <button onclick="game.setBuyMultiplier(1)" id="buyAmount1" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/40 border border-white/20 text-accent-p">x1</button>
+                    <button onclick="game.setBuyMultiplier(1)" id="buyAmount1" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/50 border border-white/20 text-accent-p">x1</button>
                     <button onclick="game.setBuyMultiplier(10)" id="buyAmount10" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60">x10</button>
                     <button onclick="game.setBuyMultiplier(100)" id="buyAmount100" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60">x100</button>
                     <button onclick="game.setBuyMultiplier('MAX')" id="buyAmountMAX" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60">MAX</button>
                 </div>
             </div>
 
-            <!-- Cabeçalho de Abas da Loja -->
-            <div class="grid grid-cols-4 border-b border-white/10 bg-black/20 p-1 gap-1 text-center">
-                <button id="tabCpcBtn" onclick="game.switchTab('cpc')" class="py-2 text-[10px] font-bold uppercase rounded-lg bg-black/40 text-accent-p border border-white/10 transition">
-                    Equip. (CPC)
+            <!-- Abas da Loja -->
+            <div class="grid grid-cols-3 border-b border-white/10 bg-black/20 p-1 gap-1 text-center">
+                <button id="tabTeamBtn" onclick="game.switchTab('team')" class="py-2 text-[10px] font-bold uppercase rounded-lg bg-black/40 text-accent-p border border-white/10 transition" data-i18n="tabTeam">
+                    Equipe (CPS)
                 </button>
-                <button id="tabCpsBtn" onclick="game.switchTab('cps')" class="py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition">
-                    Devs (CPS)
+                <button id="tabSkillsBtn" onclick="game.switchTab('skills')" class="py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition" data-i18n="tabSkills">
+                    Skills Digitação
                 </button>
-                <button id="tabHardwareBtn" onclick="game.switchTab('hardware')" class="py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition">
-                    Hardware
-                </button>
-                <button id="tabSoftwareBtn" onclick="game.switchTab('software')" class="py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition">
-                    Software
+                <button id="tabHardwareBtn" onclick="game.switchTab('hardware')" class="py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition" data-i18n="tabHardware">
+                    Hardware/Software
                 </button>
             </div>
 
-            <!-- Conteúdo da Loja com Scrollbar -->
+            <!-- Lista de Itens -->
             <div class="flex-1 overflow-y-auto p-3 space-y-2.5" id="shopContainer">
-                <!-- Itens injetados via JS -->
+                <!-- Injetado dinamicamente -->
             </div>
         </section>
 
@@ -417,7 +364,7 @@
 
     <!-- FOOTER -->
     <footer class="panel-style border-t py-2.5 text-center text-xs opacity-60 z-10">
-        Dev Clicker Extended &copy; 2026. Feito com HTML5 + JS Puro.
+        Dev Typist Pro &copy; 2026. <span data-i18n="footerTag">100% focado em digitação e velocidade de código.</span>
     </footer>
 
     <!-- CONTAINER DE TOASTS -->
@@ -425,7 +372,228 @@
 
     <script>
         /**
-         * GERENCIADOR DE ÁUDIO SINTÉTICO (Web Audio API)
+         * SISTEMA MULTI-IDIOMAS (i18n)
+         */
+        const TRANSLATIONS = {
+            pt: {
+                saveBtn: "Salvar",
+                resetBtn: "Reset",
+                devPerformance: "Desempenho Dev",
+                cpsLabel: "Linhas/seg (CPS)",
+                typingSpeedLabel: "Velocidade (WPM / CPM)",
+                globalMultiplierLabel: "Multiplicador Global",
+                nextGoalLabel: "Próxima Meta",
+                serverTitle: "Servidor",
+                serverOk: "Sistemas operando normalmente em 100%.",
+                serverOutageMsg: "Atenção: Servidor fora do ar! A automação CPS está pausada.",
+                fixServerBtn: "DEPLOY DE EMERGÊNCIA",
+                achievementsTitle: "Conquistas",
+                locTotalLabel: "Linhas Totais de Código (LOC)",
+                comboLabel: "Combo Digitação",
+                linesCompletedLabel: "Linhas Concluídas",
+                typingTerminalTitle: "Terminal de Código",
+                typingHint: "💡 Digite o código exatamente como exibido acima. Cada caractere dá LOC com base no seu combo!",
+                buyAmountLabel: "Lote:",
+                tabTeam: "Equipe (CPS)",
+                tabSkills: "Skills Digitação",
+                tabHardware: "Hardware/Software",
+                footerTag: "100% focado em digitação e velocidade de código.",
+                buyBtn: "COMPRAR",
+                
+                // Toast e Notificações
+                lineCompletedToast: "LINHA COMPLETADA!",
+                serverOutageToast: "ALERTA: Queda de servidor! Faça o deploy para restaurar!",
+                serverFixedToast: "Servidores operacionais!",
+                insufficientLoc: "LOC insuficiente para realizar esta compra!",
+                savedSuccess: "Progresso salvo com sucesso!",
+                resetConfirm: "Deseja realmente resetar todo o seu progresso?",
+
+                // Upgrades Names & Descriptions
+                up_intern_name: "Estagiário Curioso",
+                up_intern_desc: "+1 LOC/seg via código básico",
+                up_jr_dev_name: "Dev Junior Fullstack",
+                up_jr_dev_desc: "+6 LOC/seg automatizando scripts",
+                up_pleno_dev_name: "Dev Pleno Backend",
+                up_pleno_dev_desc: "+30 LOC/seg desenvolvendo APIs",
+                up_sr_dev_name: "Dev Senior 10x",
+                up_sr_dev_desc: "+130 LOC/seg otimizando sistemas",
+                up_tech_lead_name: "Tech Lead",
+                up_tech_lead_desc: "+600 LOC/seg coordenando a arquitetura",
+                up_ai_copilot_name: "Agente IA Copilot",
+                up_ai_copilot_desc: "+2.800 LOC/seg gerando código autonomamente",
+
+                up_mech_kb_name: "Teclado Mecânico RGB",
+                up_mech_kb_desc: "+20% bônus de LOC por caractere digitado",
+                up_typing_tutor_name: "Treino de Touch-Typing",
+                up_typing_tutor_desc: "+0.05 de ganho de combo por linha",
+                up_flow_state_name: "Estado de Flow",
+                up_flow_state_desc: "+50% no bônus de linha concluída",
+
+                up_ssd_nvme_name: "Storage NVMe Gen5",
+                up_ssd_nvme_desc: "+15% Multiplicador Global de Velocidade",
+                up_cloud_cluster_name: "Kubernetes Cluster",
+                up_cloud_cluster_desc: "+35% Multiplicador Global",
+                up_rust_refactor_name: "Refatoração para Rust",
+                up_rust_refactor_desc: "+75% Multiplicador Global de Performance",
+
+                // Conquistas
+                ach_first_line_title: "Primeira Linha",
+                ach_first_line_desc: "Complete sua primeira linha de código no terminal.",
+                ach_typing_master_title: "Mestre do Teclado",
+                ach_typing_master_desc: "Complete 15 linhas de código digitadas.",
+                ach_speed_demon_title: "Dev Veloz",
+                ach_speed_demon_desc: "Alcance um combo de digitação de 2.0x.",
+                ach_server_hero_title: "Herói do Plantão",
+                ach_server_hero_desc: "Resolva uma queda crítica de servidor."
+            },
+
+            en: {
+                saveBtn: "Save",
+                resetBtn: "Reset",
+                devPerformance: "Dev Performance",
+                cpsLabel: "Lines/sec (CPS)",
+                typingSpeedLabel: "Speed (WPM / CPM)",
+                globalMultiplierLabel: "Global Multiplier",
+                nextGoalLabel: "Next Goal",
+                serverTitle: "Server",
+                serverOk: "Systems operating normally at 100%.",
+                serverOutageMsg: "Warning: Main server is down! CPS automation paused.",
+                fixServerBtn: "EMERGENCY DEPLOY",
+                achievementsTitle: "Achievements",
+                locTotalLabel: "Total Lines of Code (LOC)",
+                comboLabel: "Typing Combo",
+                linesCompletedLabel: "Completed Lines",
+                typingTerminalTitle: "Code Terminal",
+                typingHint: "💡 Type the code exactly as shown above. Every character grants LOC based on your combo!",
+                buyAmountLabel: "Batch:",
+                tabTeam: "Team (CPS)",
+                tabSkills: "Typing Skills",
+                tabHardware: "Hardware/Software",
+                footerTag: "100% focused on typing precision and code speed.",
+                buyBtn: "BUY",
+
+                // Toast & Alerts
+                lineCompletedToast: "LINE COMPLETED!",
+                serverOutageToast: "ALERT: Server crash! Run emergency deploy!",
+                serverFixedToast: "Servers restored and operational!",
+                insufficientLoc: "Insufficient LOC for this purchase!",
+                savedSuccess: "Progress saved successfully!",
+                resetConfirm: "Are you sure you want to reset all progress?",
+
+                // Upgrades Names & Descriptions
+                up_intern_name: "Curious Intern",
+                up_intern_desc: "+1 LOC/sec via basic code",
+                up_jr_dev_name: "Junior Fullstack Dev",
+                up_jr_dev_desc: "+6 LOC/sec writing automated scripts",
+                up_pleno_dev_name: "Mid-level Backend Dev",
+                up_pleno_dev_desc: "+30 LOC/sec building microservices",
+                up_sr_dev_name: "10x Senior Dev",
+                up_sr_dev_desc: "+130 LOC/sec refactoring core architecture",
+                up_tech_lead_name: "Tech Lead",
+                up_tech_lead_desc: "+600 LOC/sec managing distributed systems",
+                up_ai_copilot_name: "AI Copilot Agent",
+                up_ai_copilot_desc: "+2,800 LOC/sec generating code autonomously",
+
+                up_mech_kb_name: "RGB Mechanical Keyboard",
+                up_mech_kb_desc: "+20% character typed bonus",
+                up_typing_tutor_name: "Touch-Typing Training",
+                up_typing_tutor_desc: "+0.05 combo gain per completed line",
+                up_flow_state_name: "Flow State Focus",
+                up_flow_state_desc: "+50% completed line bonus reward",
+
+                up_ssd_nvme_name: "Gen5 NVMe Storage",
+                up_ssd_nvme_desc: "+15% Global Speed Multiplier",
+                up_cloud_cluster_name: "Kubernetes Cluster",
+                up_cloud_cluster_desc: "+35% Global Multiplier",
+                up_rust_refactor_name: "Rust Rewrite",
+                up_rust_refactor_desc: "+75% Global Performance Multiplier",
+
+                // Achievements
+                ach_first_line_title: "First Line",
+                ach_first_line_desc: "Type and complete your first code snippet.",
+                ach_typing_master_title: "Keyboard Master",
+                ach_typing_master_desc: "Complete 15 full lines of code.",
+                ach_speed_demon_title: "Speed Demon",
+                ach_speed_demon_desc: "Reach a typing combo multiplier of 2.0x.",
+                ach_server_hero_title: "On-Call Hero",
+                ach_server_hero_desc: "Fix a critical server outage."
+            },
+
+            es: {
+                saveBtn: "Guardar",
+                resetBtn: "Reiniciar",
+                devPerformance: "Rendimiento Dev",
+                cpsLabel: "Líneas/seg (CPS)",
+                typingSpeedLabel: "Velocidad (WPM / CPM)",
+                globalMultiplierLabel: "Multiplicador Global",
+                nextGoalLabel: "Próxima Meta",
+                serverTitle: "Servidor",
+                serverOk: "Sistemas operando con normalidad al 100%.",
+                serverOutageMsg: "Atención: ¡Servidor caído! La automatización CPS está pausada.",
+                fixServerBtn: "DESPLIEGUE DE EMERGENCIA",
+                achievementsTitle: "Logros",
+                locTotalLabel: "Líneas Totales de Código (LOC)",
+                comboLabel: "Combo Escritura",
+                linesCompletedLabel: "Líneas Completadas",
+                typingTerminalTitle: "Terminal de Código",
+                typingHint: "💡 Escribe el código exactamente como se muestra. ¡Cada carácter otorga LOC según tu combo!",
+                buyAmountLabel: "Lote:",
+                tabTeam: "Equipo (CPS)",
+                tabSkills: "Habilidades Teclado",
+                tabHardware: "Hardware/Software",
+                footerTag: "100% enfocado en mecanografía y velocidad de código.",
+                buyBtn: "COMPRAR",
+
+                // Toast & Alertas
+                lineCompletedToast: "¡LÍNEA COMPLETADA!",
+                serverOutageToast: "ALERTA: ¡Servidor caído! Haz el despliegue de emergencia.",
+                serverFixedToast: "¡Servidores restaurados!",
+                insufficientLoc: "¡LOC insuficiente para realizar esta compra!",
+                savedSuccess: "¡Progreso guardado con éxito!",
+                resetConfirm: "¿Estás seguro de que deseas reiniciar todo tu progreso?",
+
+                // Upgrades Names & Descriptions
+                up_intern_name: "Pasante Curioso",
+                up_intern_desc: "+1 LOC/seg con código básico",
+                up_jr_dev_name: "Dev Junior Fullstack",
+                up_jr_dev_desc: "+6 LOC/seg creando scripts automáticos",
+                up_pleno_dev_name: "Dev Semi-Senior Backend",
+                up_pleno_dev_desc: "+30 LOC/seg construyendo APIs",
+                up_sr_dev_name: "Dev Senior 10x",
+                up_sr_dev_desc: "+130 LOC/seg optimizando el sistema",
+                up_tech_lead_name: "Líder Técnico",
+                up_tech_lead_desc: "+600 LOC/seg dirigiendo la arquitectura",
+                up_ai_copilot_name: "Agente IA Copilot",
+                up_ai_copilot_desc: "+2.800 LOC/seg generando código autónomo",
+
+                up_mech_kb_name: "Teclado Mecánico RGB",
+                up_mech_kb_desc: "+20% de bono por carácter escrito",
+                up_typing_tutor_name: "Mecanografía Pro",
+                up_typing_tutor_desc: "+0.05 de ganancia de combo por línea",
+                up_flow_state_name: "Estado de Flow",
+                up_flow_state_desc: "+50% de recompensa al terminar línea",
+
+                up_ssd_nvme_name: "Almacenamiento NVMe Gen5",
+                up_ssd_nvme_desc: "+15% Multiplicador Global",
+                up_cloud_cluster_name: "Cluster Kubernetes",
+                up_cloud_cluster_desc: "+35% Multiplicador Global",
+                up_rust_refactor_name: "Refactorización a Rust",
+                up_rust_refactor_desc: "+75% Multiplicador Global de Rendimiento",
+
+                // Logros
+                ach_first_line_title: "Primera Línea",
+                ach_first_line_desc: "Escribe tu primera línea de código en la terminal.",
+                ach_typing_master_title: "Maestro del Teclado",
+                ach_typing_master_desc: "Escribe 15 líneas de código completas.",
+                ach_speed_demon_title: "Velocidad Pura",
+                ach_speed_demon_desc: "Alcanza un combo de escritura de 2.0x.",
+                ach_server_hero_title: "Héroe de Guardia",
+                ach_server_hero_desc: "Resuelve una caída crítica del servidor."
+            }
+        };
+
+        /**
+         * GERENCIADOR DE SINTETIZADOR DE ÁUDIO (Web Audio API)
          */
         class SoundFX {
             constructor() {
@@ -448,15 +616,15 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(600 + Math.random() * 200, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(650 + Math.random() * 150, this.ctx.currentTime);
 
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.025);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.03);
+                osc.stop(this.ctx.currentTime + 0.025);
             }
 
             playKeyError() {
@@ -467,35 +635,15 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(130, this.ctx.currentTime);
 
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.08);
-            }
-
-            playClick() {
-                if (!this.enabled) return;
-                this.init();
-                if (!this.ctx) return;
-
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(350, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.04);
-
-                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.07);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.04);
+                osc.stop(this.ctx.currentTime + 0.07);
             }
 
             playLineComplete() {
@@ -509,16 +657,16 @@
 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.06); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+                osc.frequency.setValueAtTime(659.25, now + 0.05); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.10); // G5
 
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(now + 0.25);
+                osc.stop(now + 0.22);
             }
 
             playBuy() {
@@ -530,16 +678,16 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-                osc.frequency.setValueAtTime(600, this.ctx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(640, this.ctx.currentTime + 0.07);
 
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.12);
+                osc.stop(this.ctx.currentTime + 0.1);
             }
 
             playAlarm() {
@@ -552,123 +700,112 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.setValueAtTime(400, now + 0.1);
+                osc.frequency.setValueAtTime(700, now);
+                osc.frequency.setValueAtTime(350, now + 0.08);
 
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(now + 0.25);
+                osc.stop(now + 0.2);
             }
         }
 
         /**
-         * CLASSE PRINCIPAL DO JOGO DEV CLICKER EXTENDED
+         * CLASSE PRINCIPAL - DEV TYPIST PRO
          */
-        class DevClickerExtended {
+        class DevTypistGame {
             constructor() {
                 this.sound = new SoundFX();
-                this.activeTab = 'cpc'; // 'cpc', 'cps', 'hardware', 'software'
+                this.lang = 'pt';
+                this.activeTab = 'team'; // 'team', 'skills', 'hardware'
                 this.buyMultiplier = 1; // 1, 10, 100, 'MAX'
 
-                // Estado do Jogo
                 this.state = {
                     loc: 0,
                     totalLocEarned: 0,
-                    totalClicks: 0,
                     theme: 'vscode',
                     upgrades: {},
                     achievements: {},
                     
-                    // Stats de Digitação
                     totalCharactersTyped: 0,
                     linesCompleted: 0,
                     typingCombo: 1.0,
                     startTime: Date.now(),
                     
-                    // Servidor e Incidentes
                     serverOutage: false,
-                    bugsCount: 0
+                    serverFixedCount: 0
                 };
 
-                // Snippets de Código para o Typing Challenge
+                // SNIPPETS DE CÓDIGO (SEMPRE EM INGLÊS)
                 this.codeSnippets = [
                     { lang: 'JavaScript', code: 'const total = items.reduce((acc, item) => acc + item.price, 0);' },
                     { lang: 'JavaScript', code: 'async function fetchData(url) { return await fetch(url).then(r => r.json()); }' },
-                    { lang: 'Python', code: 'def calculate_fibonacci(n): return n if n <= 1 else calculate_fibonacci(n-1) + calculate_fibonacci(n-2)' },
+                    { lang: 'Python', code: 'def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2)' },
                     { lang: 'Python', code: 'cleaned_data = [x.strip().lower() for x in raw_lines if x]' },
-                    { lang: 'CSS', code: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));' },
+                    { lang: 'CSS', code: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));' },
                     { lang: 'HTML', code: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
-                    { lang: 'Rust', code: 'fn main() { println!("Hello, Rustaceans!"); let mut count = 0; }' },
-                    { lang: 'SQL', code: 'SELECT u.id, u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id GROUP BY u.id;' },
+                    { lang: 'Rust', code: 'fn main() { println!("Hello, World!"); let mut count = 0; }' },
+                    { lang: 'SQL', code: 'SELECT u.id, u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id;' },
                     { lang: 'C++', code: 'std::vector<std::string> tokens = split(input_string, " ");' }
                 ];
 
                 this.currentSnippetIndex = 0;
                 this.currentSnippet = this.codeSnippets[0];
 
-                // Definições de Upgrades Integradas
+                // DEFINIÇÕES DE UPGRADES
                 this.upgradeDefinitions = [
-                    // --- CPC (Equipamentos) ---
-                    { id: 'coffee', name: 'Café Expresso', type: 'cpc', baseCost: 15, power: 1, icon: 'fa-mug-hot', desc: '+1 LOC por clique' },
-                    { id: 'mech_kb', name: 'Teclado Mecânico RGB', type: 'cpc', baseCost: 120, power: 6, icon: 'fa-keyboard', desc: '+6 LOC por clique' },
-                    { id: 'dual_monitor', name: 'Monitores Ultrawide 4K', type: 'cpc', baseCost: 650, power: 25, icon: 'fa-desktop', desc: '+25 LOC por clique' },
-                    { id: 'ergo_chair', name: 'Cadeira Herman Miller', type: 'cpc', baseCost: 3000, power: 120, icon: 'fa-chair', desc: '+120 LOC por clique' },
-                    { id: 'fiber_net', name: 'Conexão Fibra Dedicada 10Gbps', type: 'cpc', baseCost: 15000, power: 500, icon: 'fa-network-wired', desc: '+500 LOC por clique' },
-                    { id: 'brain_impl', name: 'Interface Neural Direct-Link', type: 'cpc', baseCost: 100000, power: 2500, icon: 'fa-brain', desc: '+2.500 LOC por clique' },
+                    // TEAM (CPS)
+                    { id: 'intern', type: 'team', baseCost: 40, power: 1, icon: 'fa-user-graduate', keyName: 'up_intern_name', keyDesc: 'up_intern_desc' },
+                    { id: 'jr_dev', type: 'team', baseCost: 350, power: 6, icon: 'fa-user-code', keyName: 'up_jr_dev_name', keyDesc: 'up_jr_dev_desc' },
+                    { id: 'pleno_dev', type: 'team', baseCost: 2000, power: 30, icon: 'fa-user-gear', keyName: 'up_pleno_dev_name', keyDesc: 'up_pleno_dev_desc' },
+                    { id: 'sr_dev', type: 'team', baseCost: 10000, power: 130, icon: 'fa-user-ninja', keyName: 'up_sr_dev_name', keyDesc: 'up_sr_dev_desc' },
+                    { id: 'tech_lead', type: 'team', baseCost: 50000, power: 600, icon: 'fa-sitemap', keyName: 'up_tech_lead_name', keyDesc: 'up_tech_lead_desc' },
+                    { id: 'ai_copilot', type: 'team', baseCost: 250000, power: 2800, icon: 'fa-robot', keyName: 'up_ai_copilot_name', keyDesc: 'up_ai_copilot_desc' },
 
-                    // --- CPS (Equipe e Automação) ---
-                    { id: 'intern', name: 'Estagiário Curioso', type: 'cps', baseCost: 50, power: 1, icon: 'fa-user-graduate', desc: '+1 LOC/seg' },
-                    { id: 'jr_dev', name: 'Dev Junior', type: 'cps', baseCost: 400, power: 6, icon: 'fa-user-code', desc: '+6 LOC/seg' },
-                    { id: 'pleno_dev', name: 'Dev Pleno Fullstack', type: 'cps', baseCost: 2500, power: 30, icon: 'fa-user-gear', desc: '+30 LOC/seg' },
-                    { id: 'sr_dev', name: 'Dev Senior 10x', type: 'cps', baseCost: 12000, power: 130, icon: 'fa-user-ninja', desc: '+130 LOC/seg' },
-                    { id: 'tech_lead', name: 'Tech Lead / Arquiteto', type: 'cps', baseCost: 60000, power: 600, icon: 'fa-sitemap', desc: '+600 LOC/seg' },
-                    { id: 'ai_copilot', name: 'Agente de IA Copilot', type: 'cps', baseCost: 300000, power: 2800, icon: 'fa-robot', desc: '+2.800 LOC/seg' },
-                    { id: 'devops_team', name: 'Esquadrão SRE & DevOps', type: 'cps', baseCost: 1500000, power: 12000, icon: 'fa-users-gear', desc: '+12.000 LOC/seg' },
+                    // TYPING SKILLS
+                    { id: 'mech_kb', type: 'skills', baseCost: 100, charBonus: 0.20, icon: 'fa-keyboard', keyName: 'up_mech_kb_name', keyDesc: 'up_mech_kb_desc' },
+                    { id: 'typing_tutor', type: 'skills', baseCost: 800, comboBonus: 0.05, icon: 'fa-graduation-cap', keyName: 'up_typing_tutor_name', keyDesc: 'up_typing_tutor_desc' },
+                    { id: 'flow_state', type: 'skills', baseCost: 5000, lineRewardBonus: 0.50, icon: 'fa-bolt', keyName: 'up_flow_state_name', keyDesc: 'up_flow_state_desc' },
 
-                    // --- HARDWARE (Multiplicadores Globais de %) ---
-                    { id: 'ssd_nvme', name: 'Storage NVMe Gen5 Raid', type: 'hardware', baseCost: 1000, multiplier: 0.15, icon: 'fa-microchip', desc: '+15% Multiplicador Global' },
-                    { id: 'server_blade', name: 'Servidor Blade Local', type: 'hardware', baseCost: 8000, multiplier: 0.25, icon: 'fa-server', desc: '+25% Multiplicador Global' },
-                    { id: 'cloud_cluster', name: 'Kubernetes Cluster Multicloud', type: 'hardware', baseCost: 50000, multiplier: 0.40, icon: 'fa-cloud', desc: '+40% Multiplicador Global' },
-                    { id: 'quantum_cpu', name: 'Processador Quântico 128-Qubit', type: 'hardware', baseCost: 500000, multiplier: 0.75, icon: 'fa-atom', desc: '+75% Multiplicador Global' },
-
-                    // --- SOFTWARE & FRAMEWORKS (Multiplicadores Globais) ---
-                    { id: 'linux_distro', name: 'Migrar para Arch Linux / Gentoo', type: 'software', baseCost: 2000, multiplier: 0.20, icon: 'fa-terminal', desc: '+20% Multiplicador Global' },
-                    { id: 'docker_setup', name: 'Containerização Docker Pro', type: 'software', baseCost: 15000, multiplier: 0.30, icon: 'fa-cubes', desc: '+30% Multiplicador Global' },
-                    { id: 'rust_refactor', name: 'Refatoração Total para Rust', type: 'software', baseCost: 100000, multiplier: 0.50, icon: 'fa-gear', desc: '+50% Multiplicador Global' },
-                    { id: 'agile_ci_cd', name: 'Pipeline CI/CD Automatizada', type: 'software', baseCost: 750000, multiplier: 1.00, icon: 'fa-arrows-spin', desc: '+100% Multiplicador Global' }
+                    // HARDWARE & SOFTWARE (Multiplicadores Globais)
+                    { id: 'ssd_nvme', type: 'hardware', baseCost: 1500, multiplier: 0.15, icon: 'fa-microchip', keyName: 'up_ssd_nvme_name', keyDesc: 'up_ssd_nvme_desc' },
+                    { id: 'cloud_cluster', type: 'hardware', baseCost: 30000, multiplier: 0.35, icon: 'fa-cloud', keyName: 'up_cloud_cluster_name', keyDesc: 'up_cloud_cluster_desc' },
+                    { id: 'rust_refactor', type: 'hardware', baseCost: 200000, multiplier: 0.75, icon: 'fa-gear', keyName: 'up_rust_refactor_name', keyDesc: 'up_rust_refactor_desc' }
                 ];
 
-                // Definição de Conquistas
+                // DEFINIÇÕES DE CONQUISTAS
                 this.achievementDefinitions = [
-                    { id: 'first_line', title: 'Primeira Linha', desc: 'Digite ou clique para gerar 1 LOC.', reqType: 'totalLoc', reqVal: 1, icon: 'fa-code' },
-                    { id: 'typing_master', title: 'Mestre do Teclado', desc: 'Complete 10 linhas de código digitadas.', reqType: 'linesTyped', reqVal: 10, icon: 'fa-keyboard' },
-                    { id: 'loc_10k', title: 'Engenheiro de Software', desc: 'Acumule 10.000 LOC.', reqType: 'totalLoc', reqVal: 10000, icon: 'fa-laptop-code' },
-                    { id: 'speed_demon', title: 'Modo Turbo', desc: 'Alcance um Combo de Digitação de 2.0x.', reqType: 'maxCombo', reqVal: 2.0, icon: 'fa-bolt' },
-                    { id: 'outage_hero', title: 'Herói do Plantão', desc: 'Resolva uma queda de servidor crítica.', reqType: 'serverFix', reqVal: 1, icon: 'fa-shield-halved' },
-                    { id: 'loc_1m', title: 'Tech Unicorn', desc: 'Acumule 1 Milhão de LOC.', reqType: 'totalLoc', reqVal: 1000000, icon: 'fa-crown' }
+                    { id: 'first_line', reqType: 'linesTyped', reqVal: 1, icon: 'fa-code', keyTitle: 'ach_first_line_title', keyDesc: 'ach_first_line_desc' },
+                    { id: 'typing_master', reqType: 'linesTyped', reqVal: 15, icon: 'fa-keyboard', keyTitle: 'ach_typing_master_title', keyDesc: 'ach_typing_master_desc' },
+                    { id: 'speed_demon', reqType: 'maxCombo', reqVal: 2.0, icon: 'fa-bolt', keyTitle: 'ach_speed_demon_title', keyDesc: 'ach_speed_demon_desc' },
+                    { id: 'server_hero', reqType: 'serverFix', reqVal: 1, icon: 'fa-shield-halved', keyTitle: 'ach_server_hero_title', keyDesc: 'ach_server_hero_desc' }
                 ];
 
-                this.goals = [100, 1000, 10000, 100000, 1000000, 10000000];
+                this.goals = [100, 1000, 10000, 100000, 1000000];
 
-                // Inicializar Upgrades no State
-                this.upgradeDefinitions.forEach(u => {
-                    this.state.upgrades[u.id] = 0;
-                });
-
+                this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
                 this.init();
             }
 
             init() {
                 this.loadGame();
+                this.applyLanguageUI();
                 this.changeTheme(this.state.theme || 'vscode');
                 this.loadNextSnippet();
                 this.renderShop();
                 this.renderAchievements();
                 this.updateUI();
+
+                // Manter foco no input de digitação para fluidez do jogo
+                const inputEl = document.getElementById('typingInput');
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('button') && !e.target.closest('select') && !e.target.closest('a')) {
+                        inputEl.focus();
+                    }
+                });
 
                 // Game Loop Principal (100ms)
                 let lastTime = Date.now();
@@ -682,12 +819,11 @@
                 // Auto-save a cada 15s
                 setInterval(() => this.saveGame(false), 15000);
 
-                // Agendador de Incidente de Servidor Aleatório (a cada 45-90 segundos)
+                // Agendador de Eventos de Servidor
                 this.scheduleServerIncidents();
             }
 
             gameLoop(delta) {
-                // Se o servidor estiver caido, o CPS é congelado
                 if (!this.state.serverOutage) {
                     const cps = this.calculateCPS();
                     if (cps > 0) {
@@ -701,7 +837,32 @@
                 this.updateUI();
             }
 
-            // Múltiplos e Multiplicadores Globais
+            // TROCA DE IDIOMA DINÂMICA
+            setLanguage(langCode) {
+                if (!TRANSLATIONS[langCode]) return;
+                this.lang = langCode;
+                document.getElementById('langSelect').value = langCode;
+                this.applyLanguageUI();
+                this.renderShop();
+                this.renderAchievements();
+                this.updateUI();
+            }
+
+            applyLanguageUI() {
+                const dict = TRANSLATIONS[this.lang];
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[key]) el.innerText = dict[key];
+                });
+
+                if (this.state.serverOutage) {
+                    document.getElementById('serverStatusText').innerText = dict.serverOutageMsg;
+                } else {
+                    document.getElementById('serverStatusText').innerText = dict.serverOk;
+                }
+            }
+
+            // MULTIPLICADORES E CÁLCULOS
             getGlobalMultiplier() {
                 let mult = 1.0;
                 this.upgradeDefinitions.filter(u => u.multiplier).forEach(u => {
@@ -711,24 +872,15 @@
                 return mult;
             }
 
-            calculateCPC() {
-                let baseCpc = 1.0;
-                this.upgradeDefinitions.filter(u => u.type === 'cpc').forEach(u => {
-                    baseCpc += u.power * (this.state.upgrades[u.id] || 0);
-                });
-                return baseCpc * this.getGlobalMultiplier();
-            }
-
             calculateCPS() {
                 let baseCps = 0.0;
-                this.upgradeDefinitions.filter(u => u.type === 'cps').forEach(u => {
+                this.upgradeDefinitions.filter(u => u.type === 'team').forEach(u => {
                     baseCps += u.power * (this.state.upgrades[u.id] || 0);
                 });
                 return baseCps * this.getGlobalMultiplier();
             }
 
-            // FÓRMULA EXPONENCIAL DE COMPRA EM LOTE (SOMA DA SÉRIE GEOMÉTRICA)
-            // Cost_total = Cost_base * (r^(current + count) - r^(current)) / (r - 1) com r = 1.15
+            // COMPRA EM LOTE / FÓRMULA GEOMÉTRICA
             getUpgradeCostForAmount(upgrade, amount) {
                 const r = 1.15;
                 const current = this.state.upgrades[upgrade.id] || 0;
@@ -742,14 +894,12 @@
                 return Math.floor(totalCost);
             }
 
-            // CÁLCULO DO MÁXIMO COMPRÁVEL (BUY MAX)
             getMaxAffordableCount(upgrade) {
                 const r = 1.15;
                 const current = this.state.upgrades[upgrade.id] || 0;
                 const base = upgrade.baseCost;
                 const currentLoc = this.state.loc;
 
-                // Fórmula Inversa: count = floor( log( (Loc * (r - 1) / (base * r^current)) + 1 ) / log(r) )
                 const term1 = (currentLoc * (r - 1)) / (base * Math.pow(r, current));
                 if (term1 <= 0) return 0;
 
@@ -757,13 +907,15 @@
                 return Math.max(0, count);
             }
 
-            // MODO DIGITAÇÃO (TYPING CHALLENGE)
+            // SISTEMA DE DIGITAÇÃO
             loadNextSnippet() {
                 this.currentSnippetIndex = (this.currentSnippetIndex + 1) % this.codeSnippets.length;
                 this.currentSnippet = this.codeSnippets[this.currentSnippetIndex];
                 
                 document.getElementById('typingLangBadge').innerText = this.currentSnippet.lang;
-                document.getElementById('typingInput').value = '';
+                const inputEl = document.getElementById('typingInput');
+                inputEl.value = '';
+                inputEl.focus();
                 this.renderSnippetProgress('');
             }
 
@@ -795,37 +947,41 @@
                 const target = this.currentSnippet.code;
                 this.renderSnippetProgress(input);
 
-                // Feedback sonoro para tecla pressionada
                 if (input.length > 0) {
                     const lastCharIndex = input.length - 1;
                     if (input[lastCharIndex] === target[lastCharIndex]) {
                         this.sound.playKeyStroke();
                         this.state.totalCharactersTyped++;
 
-                        // Bônus por caractere correto
-                        const charBonus = this.calculateCPC() * 0.1 * this.state.typingCombo;
+                        // Bônus base por caractere + upgrade de teclado
+                        const kbUpgradeBonus = 1.0 + ((this.state.upgrades['mech_kb'] || 0) * 0.20);
+                        const charBonus = 1 * kbUpgradeBonus * this.state.typingCombo * this.getGlobalMultiplier();
+                        
                         this.state.loc += charBonus;
                         this.state.totalLocEarned += charBonus;
                     } else {
                         this.sound.playKeyError();
-                        // Penalidade no combo se errar
                         this.state.typingCombo = Math.max(1.0, this.state.typingCombo - 0.05);
                     }
                 }
 
-                // Se completou a linha com 100% de precisão
+                // Quando completa a linha
                 if (input === target) {
                     this.sound.playLineComplete();
                     this.state.linesCompleted++;
-                    this.state.typingCombo = Math.min(3.0, this.state.typingCombo + 0.15); // Aumenta combo
+                    
+                    const comboStep = 0.15 + ((this.state.upgrades['typing_tutor'] || 0) * 0.05);
+                    this.state.typingCombo = Math.min(3.5, this.state.typingCombo + comboStep);
 
-                    // Recompensa grande por linha
-                    const lineReward = target.length * this.calculateCPC() * 2 * this.state.typingCombo;
+                    const flowBonus = 1.0 + ((this.state.upgrades['flow_state'] || 0) * 0.50);
+                    const lineReward = target.length * 2.5 * this.state.typingCombo * flowBonus * this.getGlobalMultiplier();
+                    
                     this.state.loc += lineReward;
                     this.state.totalLocEarned += lineReward;
 
-                    this.showToast(`LINHA CONCLUÍDA! +${this.formatNumber(lineReward)} LOC`, 'success');
-                    this.logConsole(`Linha de código em ${this.currentSnippet.lang} compilada com sucesso.`);
+                    const dict = TRANSLATIONS[this.lang];
+                    this.showToast(`${dict.lineCompletedToast} +${this.formatNumber(lineReward)} LOC`, 'success');
+                    this.logConsole(`Compiled [${this.currentSnippet.lang}]: Line completed cleanly.`);
 
                     this.loadNextSnippet();
                 }
@@ -834,63 +990,23 @@
             }
 
             skipSnippet() {
-                this.state.typingCombo = 1.0; // Pular reseta combo
-                this.logConsole('Linha de código pulada.');
+                this.state.typingCombo = 1.0;
+                this.logConsole('Code line skipped.');
                 this.loadNextSnippet();
                 this.updateUI();
-            }
-
-            // CLIQUE MANUAL
-            handleClick(event) {
-                const cpc = this.calculateCPC();
-                this.state.loc += cpc;
-                this.state.totalLocEarned += cpc;
-                this.state.totalClicks++;
-
-                this.sound.playClick();
-                this.createFloatingText(event, `+${this.formatNumber(cpc)} LOC`);
-
-                if (Math.random() < 0.12) {
-                    const logs = [
-                        'git commit -m "hotfix"',
-                        'console.log("Bug resolvido");',
-                        'docker-compose up -d',
-                        'npm run build:prod'
-                    ];
-                    this.logConsole(logs[Math.floor(Math.random() * logs.length)]);
-                }
-
-                this.updateUI();
-            }
-
-            createFloatingText(event, text) {
-                const btn = document.getElementById('mainClickBtn');
-                const rect = btn.getBoundingClientRect();
-                const x = event ? event.clientX : rect.left + rect.width / 2;
-                const y = event ? event.clientY : rect.top + rect.height / 2;
-
-                const el = document.createElement('div');
-                el.className = 'floating-text code-font text-accent-p text-sm';
-                el.innerText = text;
-                el.style.left = `${x - 20 + (Math.random() * 20 - 10)}px`;
-                el.style.top = `${y - 30}px`;
-
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 900);
             }
 
             // COMPRA DE UPGRADES
             setBuyMultiplier(amount) {
                 this.buyMultiplier = amount;
                 
-                // Atualizar botões de seleção de lote
                 document.querySelectorAll('.buy-amount-btn').forEach(btn => {
                     btn.className = "buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60";
                 });
 
                 const activeBtn = document.getElementById(`buyAmount${amount}`);
                 if (activeBtn) {
-                    activeBtn.className = "buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/40 border border-white/20 text-accent-p";
+                    activeBtn.className = "buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/50 border border-white/20 text-accent-p";
                 }
 
                 this.renderShop();
@@ -906,7 +1022,7 @@
 
                 if (this.buyMultiplier === 'MAX') {
                     amountToBuy = this.getMaxAffordableCount(upgrade);
-                    if (amountToBuy <= 0) amountToBuy = 1; // Tenta pelo menos 1 se clicar
+                    if (amountToBuy <= 0) amountToBuy = 1;
                     cost = this.getUpgradeCostForAmount(upgrade, amountToBuy);
                 } else {
                     amountToBuy = parseInt(this.buyMultiplier);
@@ -918,20 +1034,20 @@
                     this.state.upgrades[upgradeId] = (this.state.upgrades[upgradeId] || 0) + amountToBuy;
                     
                     this.sound.playBuy();
-                    this.logConsole(`Comprado: ${upgrade.name} (+${amountToBuy})`);
+                    this.logConsole(`Purchased: ${upgradeId} (+${amountToBuy})`);
                     
                     this.renderShop();
                     this.updateUI();
                 } else {
-                    this.showToast('LOC insuficiente para realizar esta compra!', 'error');
+                    this.showToast(TRANSLATIONS[this.lang].insufficientLoc, 'error');
                 }
             }
 
-            // EVENTO DE SERVidor CAÍDO (INCIDENTES DE DIFICULDADE)
+            // INCIDENTES DE SERVIDOR
             scheduleServerIncidents() {
-                const nextTime = Math.random() * 45000 + 45000; // a cada 45-90s
+                const nextTime = Math.random() * 50000 + 50000; // 50-100s
                 setTimeout(() => {
-                    if (!this.state.serverOutage && Math.random() < 0.4) {
+                    if (!this.state.serverOutage && Math.random() < 0.35) {
                         this.triggerServerOutage();
                     }
                     this.scheduleServerIncidents();
@@ -947,14 +1063,16 @@
                 const statusText = document.getElementById('serverStatusText');
                 const fixBtn = document.getElementById('fixServerBtn');
 
-                statusCard.classList.add('border-red-500/80', 'bg-red-950/30');
+                statusCard.classList.add('border-red-500/80', 'bg-red-950/20');
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse";
-                badge.innerText = "OUTAGE CRÍTICO";
-                statusText.innerText = "Atenção: Servidor principal fora do ar! A produção de CPS está pausada.";
+                badge.innerText = "OUTAGE";
                 
+                const dict = TRANSLATIONS[this.lang];
+                statusText.innerText = dict.serverOutageMsg;
                 fixBtn.classList.remove('hidden');
-                this.showToast('ALERTA: Servidores caíram! Execute o deploy de emergência!', 'error');
-                this.logConsole('INCIDENTE CRÍTICO: Servidor fora do ar.');
+
+                this.showToast(dict.serverOutageToast, 'error');
+                this.logConsole('CRITICAL SYSTEM ALERT: Server instance unresponsive.');
             }
 
             resolveServerOutage() {
@@ -966,31 +1084,31 @@
                 const statusText = document.getElementById('serverStatusText');
                 const fixBtn = document.getElementById('fixServerBtn');
 
-                statusCard.classList.remove('border-red-500/80', 'bg-red-950/30');
+                statusCard.classList.remove('border-red-500/80', 'bg-red-950/20');
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
                 badge.innerText = "ONLINE";
-                statusText.innerText = "Sistemas operando em 100% de capacidade.";
                 
+                const dict = TRANSLATIONS[this.lang];
+                statusText.innerText = dict.serverOk;
                 fixBtn.classList.add('hidden');
-                this.showToast('SERVIDORES RESTAURADOS COM SUCESSO!', 'success');
-                this.logConsole('Incidente resolvido. Serviços reestabelecidos.');
+
+                this.showToast(dict.serverFixedToast, 'success');
+                this.logConsole('Emergency patch deployed. Operational status restored.');
 
                 this.state.serverFixedCount = (this.state.serverFixedCount || 0) + 1;
                 this.updateUI();
             }
 
-            // ATUALIZAÇÃO DA INTERFACE (UI)
+            // RENDERIZAÇÃO DA UI
             updateUI() {
                 document.getElementById('locDisplay').innerText = this.formatNumber(Math.floor(this.state.loc));
-                document.getElementById('cpsDisplay').innerText = this.formatNumber(this.calculateCPS(), true) + (this.state.serverOutage ? ' (PAUSADO)' : '');
-                document.getElementById('cpcDisplay').innerText = this.formatNumber(this.calculateCPC(), true);
-                document.getElementById('clickPowerText').innerText = this.formatNumber(this.calculateCPC());
+                document.getElementById('cpsDisplay').innerText = this.formatNumber(this.calculateCPS(), true) + (this.state.serverOutage ? ' (PAUSED)' : '');
                 document.getElementById('globalMultiplierDisplay').innerText = `${this.getGlobalMultiplier().toFixed(2)}x`;
                 
                 document.getElementById('comboDisplay').innerText = `${this.state.typingCombo.toFixed(2)}x`;
                 document.getElementById('linesCompletedDisplay').innerText = this.state.linesCompleted;
 
-                // Calcular WPM / CPM
+                // Calcular WPM/CPM
                 const elapsedMinutes = Math.max(0.1, (Date.now() - this.state.startTime) / 60000);
                 const cpm = Math.floor(this.state.totalCharactersTyped / elapsedMinutes);
                 const wpm = Math.floor(cpm / 5);
@@ -998,7 +1116,7 @@
 
                 this.updateProgressBar();
 
-                // Atualizar estado dos cards da loja
+                // Atualizar estado de disponibilidade na loja
                 this.upgradeDefinitions.forEach(upgrade => {
                     const card = document.getElementById(`upgrade-card-${upgrade.id}`);
                     if (card) {
@@ -1028,13 +1146,14 @@
                 
                 document.getElementById('goalProgressBar').style.width = `${progress}%`;
                 document.getElementById('nextGoalPercent').innerText = `${Math.floor(progress)}%`;
-                document.getElementById('nextGoalText').innerText = `Próxima Meta: ${this.formatNumber(currentGoal)} LOC`;
+                document.getElementById('nextGoalText').innerText = `${TRANSLATIONS[this.lang].nextGoalLabel}: ${this.formatNumber(currentGoal)} LOC`;
             }
 
             renderShop() {
                 const container = document.getElementById('shopContainer');
                 container.innerHTML = '';
 
+                const dict = TRANSLATIONS[this.lang];
                 const filteredUpgrades = this.upgradeDefinitions.filter(u => u.type === this.activeTab);
 
                 filteredUpgrades.forEach(upgrade => {
@@ -1044,25 +1163,28 @@
                     let cost = this.getUpgradeCostForAmount(upgrade, amount);
                     const canAfford = this.state.loc >= cost && amount > 0;
 
+                    const title = dict[upgrade.keyName] || upgrade.keyName;
+                    const desc = dict[upgrade.keyDesc] || upgrade.keyDesc;
+
                     const card = document.createElement('div');
                     card.id = `upgrade-card-${upgrade.id}`;
                     card.className = `p-2.5 rounded-xl bg-black/30 border border-white/10 flex items-center justify-between gap-2 transition ${canAfford ? '' : 'opacity-50'}`;
 
                     card.innerHTML = `
                         <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 rounded-lg bg-black/40 flex items-center justify-center text-accent-p border border-white/10">
+                            <div class="w-9 h-9 rounded-lg bg-black/50 flex items-center justify-center text-accent-p border border-white/10 flex-shrink-0">
                                 <i class="fa-solid ${upgrade.icon} text-base"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-1.5">
-                                    <h4 class="font-bold text-xs">${upgrade.name}</h4>
-                                    <span class="text-[10px] code-font px-1 py-0.2 bg-black/50 text-accent-p border border-white/10 rounded">x${count}</span>
+                                    <h4 class="font-bold text-xs">${title}</h4>
+                                    <span class="text-[10px] code-font px-1 py-0.2 bg-black/60 text-accent-p border border-white/10 rounded">x${count}</span>
                                 </div>
-                                <p class="text-[10px] opacity-70 mt-0.5">${upgrade.desc}</p>
+                                <p class="text-[10px] opacity-70 mt-0.5 leading-tight">${desc}</p>
                             </div>
                         </div>
-                        <button onclick="game.buyUpgrade('${upgrade.id}')" ${canAfford ? '' : 'disabled'} class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-black/40 text-white font-bold text-xs code-font transition flex flex-col items-center min-w-[85px]">
-                            <span>COMPRAR</span>
+                        <button onclick="game.buyUpgrade('${upgrade.id}')" ${canAfford ? '' : 'disabled'} class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-black/40 text-white font-bold text-xs code-font transition flex flex-col items-center min-w-[80px] flex-shrink-0">
+                            <span>${dict.buyBtn}</span>
                             <span class="cost-display text-[9px] opacity-90">${this.formatNumber(cost)} LOC</span>
                         </button>
                     `;
@@ -1074,11 +1196,15 @@
             renderAchievements() {
                 const container = document.getElementById('achievementsContainer');
                 container.innerHTML = '';
+                const dict = TRANSLATIONS[this.lang];
                 let unlockedCount = 0;
 
                 this.achievementDefinitions.forEach(ach => {
                     const isUnlocked = !!this.state.achievements[ach.id];
                     if (isUnlocked) unlockedCount++;
+
+                    const title = dict[ach.keyTitle] || ach.keyTitle;
+                    const desc = dict[ach.keyDesc] || ach.keyDesc;
 
                     const item = document.createElement('div');
                     item.className = `p-2 rounded-lg border text-xs flex items-center gap-2.5 transition ${isUnlocked ? 'bg-amber-500/10 border-amber-500/30' : 'bg-black/20 border-white/5 opacity-50'}`;
@@ -1088,8 +1214,8 @@
                             <i class="fa-solid ${ach.icon} text-xs"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="font-bold text-[11px] ${isUnlocked ? 'text-amber-300' : 'opacity-70'}">${ach.title}</div>
-                            <div class="text-[10px] opacity-60">${ach.desc}</div>
+                            <div class="font-bold text-[11px] ${isUnlocked ? 'text-amber-300' : 'opacity-70'}">${title}</div>
+                            <div class="text-[10px] opacity-60 leading-tight">${desc}</div>
                         </div>
                         ${isUnlocked ? '<i class="fa-solid fa-check text-accent-p text-xs mr-1"></i>' : ''}
                     `;
@@ -1105,8 +1231,6 @@
                     if (this.state.achievements[ach.id]) return;
 
                     let unlocked = false;
-
-                    if (ach.reqType === 'totalLoc' && this.state.totalLocEarned >= ach.reqVal) unlocked = true;
                     if (ach.reqType === 'linesTyped' && this.state.linesCompleted >= ach.reqVal) unlocked = true;
                     if (ach.reqType === 'maxCombo' && this.state.typingCombo >= ach.reqVal) unlocked = true;
                     if (ach.reqType === 'serverFix' && (this.state.serverFixedCount || 0) >= ach.reqVal) unlocked = true;
@@ -1114,8 +1238,10 @@
                     if (unlocked) {
                         this.state.achievements[ach.id] = true;
                         this.sound.playLineComplete();
-                        this.showToast(`CONQUISTA: ${ach.title}!`, 'achievement');
-                        this.logConsole(`Conquista desbloqueada: ${ach.title}`);
+                        
+                        const title = TRANSLATIONS[this.lang][ach.keyTitle] || ach.keyTitle;
+                        this.showToast(`🏆 ${title}`, 'achievement');
+                        this.logConsole(`Achievement Unlocked: ${title}`);
                         this.renderAchievements();
                     }
                 });
@@ -1123,7 +1249,7 @@
 
             switchTab(tab) {
                 this.activeTab = tab;
-                const tabs = ['cpc', 'cps', 'hardware', 'software'];
+                const tabs = ['team', 'skills', 'hardware'];
                 
                 tabs.forEach(t => {
                     const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
@@ -1212,28 +1338,30 @@
 
             saveGame(manual = false) {
                 try {
-                    localStorage.setItem('dev_clicker_ext_save', JSON.stringify(this.state));
-                    if (manual) this.showToast('Progresso salvo com sucesso!', 'success');
+                    const dataToSave = { ...this.state, lang: this.lang };
+                    localStorage.setItem('dev_typist_pro_save', JSON.stringify(dataToSave));
+                    if (manual) this.showToast(TRANSLATIONS[this.lang].savedSuccess, 'success');
                 } catch (e) {
-                    console.error("Erro ao salvar progresso", e);
+                    console.error("Save error", e);
                 }
             }
 
             loadGame() {
                 try {
-                    const saved = localStorage.getItem('dev_clicker_ext_save');
+                    const saved = localStorage.getItem('dev_typist_pro_save');
                     if (saved) {
                         const parsed = JSON.parse(saved);
                         this.state = { ...this.state, ...parsed };
+                        if (parsed.lang) this.lang = parsed.lang;
                     }
                 } catch (e) {
-                    console.error("Erro ao carregar dados salvos", e);
+                    console.error("Load error", e);
                 }
             }
 
             confirmReset() {
-                if (window.confirm("Deseja reiniciar todo o seu progresso no Dev Clicker Extended?")) {
-                    localStorage.removeItem('dev_clicker_ext_save');
+                if (window.confirm(TRANSLATIONS[this.lang].resetConfirm)) {
+                    localStorage.removeItem('dev_typist_pro_save');
                     window.location.reload();
                 }
             }
@@ -1241,7 +1369,7 @@
 
         let game;
         window.addEventListener('DOMContentLoaded', () => {
-            game = new DevClickerExtended();
+            game = new DevTypistGame();
         });
     </script>
 </body>

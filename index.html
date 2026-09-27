@@ -6,6 +6,8 @@
     <title>Dev Typist Pro - Multi-Language Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -153,6 +155,25 @@
 <body data-theme="vscode" class="min-h-screen flex flex-col justify-between relative">
     <div class="scanline fixed inset-0 z-40"></div>
 
+    <!-- PAINEL DE CONTA -->
+    <div id="authOverlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur flex items-center justify-center p-4">
+        <div class="panel-style border rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h2 class="text-lg font-bold mb-1 text-accent-p"><i class="fa-solid fa-user-lock"></i> Entrar no Dev Typist Pro</h2>
+            <p class="text-xs opacity-70 mb-4">Crie uma conta pra salvar seu progresso e acessar de qualquer dispositivo.</p>
+            <input id="authEmail" type="email" placeholder="seu@email.com" class="w-full mb-2 bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            <input id="authPassword" type="password" placeholder="senha (mínimo 6 caracteres)" class="w-full mb-3 bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            <div class="flex gap-2 mb-2">
+                <button onclick="game.signIn()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition">Entrar</button>
+                <button onclick="game.signUp()" class="flex-1 py-2 bg-black/50 hover:bg-black/70 border border-white/20 text-xs font-bold rounded-lg transition">Criar Conta</button>
+            </div>
+            <button disabled title="Requer configuração manual do provedor Google no painel do Supabase" class="w-full py-2 bg-black/30 opacity-40 cursor-not-allowed text-xs font-bold rounded-lg border border-white/10 flex items-center justify-center gap-2">
+                <i class="fa-brands fa-google"></i> Entrar com Google (em breve)
+            </button>
+            <p id="authError" class="text-[11px] text-red-400 mt-3 hidden"></p>
+            <button onclick="game.skipAuth()" class="w-full mt-3 text-[11px] opacity-50 hover:opacity-80 underline">Jogar sem conta (não sincroniza)</button>
+        </div>
+    </div>
+
     <!-- HEADER / BARRA SUPERIOR -->
     <header class="panel-style border-b px-4 py-3 sticky top-0 z-30 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
@@ -168,6 +189,7 @@
                     <span>Dev<span class="text-accent-p">Typist</span>.pro</span>
                 </h1>
                 <span class="text-[10px] px-2 py-0.5 rounded bg-black/40 border border-white/10 hidden sm:inline-block text-accent-s font-mono">100% TYPING</span>
+                <span id="accountBadge" class="text-[10px] px-2 py-0.5 rounded bg-black/40 border border-white/10 text-accent-amb font-mono cursor-pointer" onclick="game.accountBadgeClick()">Visitante</span>
             </div>
 
             <!-- CONTROLES (IDIOMA, TEMA, SOM, SAVE, RESET) -->
@@ -394,6 +416,13 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
+        /**
+         * CONFIGURAÇÃO DO SUPABASE
+         */
+        const SUPABASE_URL = 'https://hpjiizwpihqlgxjawycp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_DV9uMCjUZexs0j8qKh_8HA_Smoyf3Oa';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         /**
          * SISTEMA MULTI-IDIOMAS (i18n)
          */
@@ -852,6 +881,7 @@
 
             init() {
                 this.loadGame();
+                this.initAuth();
                 this.applyLanguageUI();
                 this.changeTheme(this.state.theme || 'vscode');
                 this.loadNextSnippet();
@@ -1441,10 +1471,114 @@
                 return `${formatted} ${suffixes[i]}`;
             }
 
+            // AUTENTICAÇÃO E SINCRONIZAÇÃO (SUPABASE)
+            async initAuth() {
+                this.currentUser = null;
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session?.user) {
+                    await this.onAuthReady(session.user);
+                } else if (localStorage.getItem('dev_typist_skip_auth') !== '1') {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                } else {
+                    document.getElementById('authOverlay').classList.add('hidden');
+                }
+
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session?.user) {
+                        this.onAuthReady(session.user);
+                    } else if (event === 'SIGNED_OUT') {
+                        this.currentUser = null;
+                        document.getElementById('accountBadge').innerText = 'Visitante';
+                    }
+                });
+            }
+
+            async onAuthReady(user) {
+                this.currentUser = user;
+                document.getElementById('authOverlay').classList.add('hidden');
+                document.getElementById('accountBadge').innerText = user.email;
+                await this.loadFromCloud();
+            }
+
+            showAuthError(message) {
+                const el = document.getElementById('authError');
+                el.innerText = message;
+                el.classList.remove('hidden');
+            }
+
+            async signUp() {
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value;
+                if (!email || password.length < 6) {
+                    this.showAuthError('E-mail válido e senha com 6+ caracteres.');
+                    return;
+                }
+                const { error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) {
+                    this.showAuthError(error.message);
+                    return;
+                }
+                this.showAuthError('Conta criada! Se a confirmação por e-mail estiver ativa, confira sua caixa de entrada antes de entrar.');
+            }
+
+            async signIn() {
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value;
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    this.showAuthError(error.message);
+                }
+            }
+
+            async signOut() {
+                await supabaseClient.auth.signOut();
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+
+            skipAuth() {
+                localStorage.setItem('dev_typist_skip_auth', '1');
+                document.getElementById('authOverlay').classList.add('hidden');
+            }
+
+            accountBadgeClick() {
+                if (this.currentUser) {
+                    if (window.confirm('Sair da conta?')) this.signOut();
+                } else {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                }
+            }
+
+            async loadFromCloud() {
+                if (!this.currentUser) return;
+                const { data, error } = await supabaseClient
+                    .from('devtypist_saves')
+                    .select('state')
+                    .eq('user_id', this.currentUser.id)
+                    .maybeSingle();
+
+                if (!error && data?.state && Object.keys(data.state).length > 0) {
+                    this.state = { ...this.state, ...data.state };
+                    this.renderShop();
+                    this.renderAchievements();
+                    this.updateUI();
+                    this.logConsole('Progresso carregado da nuvem.');
+                } else {
+                    await this.saveToCloud();
+                }
+            }
+
+            async saveToCloud() {
+                if (!this.currentUser) return;
+                await supabaseClient
+                    .from('devtypist_saves')
+                    .upsert({ user_id: this.currentUser.id, state: this.state, updated_at: new Date().toISOString() });
+            }
+
             saveGame(manual = false) {
                 try {
                     const dataToSave = { ...this.state, lang: this.lang };
                     localStorage.setItem('dev_typist_pro_save', JSON.stringify(dataToSave));
+                    if (this.currentUser) this.saveToCloud();
                     if (manual) this.showToast(TRANSLATIONS[this.lang].savedSuccess, 'success');
                 } catch (e) {
                     console.error("Save error", e);

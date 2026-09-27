@@ -206,6 +206,12 @@
                     <span data-i18n="saveBtn" class="hidden md:inline">Salvar</span>
                 </button>
 
+                <!-- Prestígio -->
+                <button onclick="game.prestige()" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-amber-900/40 text-amber-400 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
+                    <i class="fa-solid fa-arrow-rotate-right"></i>
+                    <span class="hidden md:inline">Reiniciar Carreira</span>
+                </button>
+
                 <!-- Reset -->
                 <button onclick="game.confirmReset()" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-red-900/40 text-red-400 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
                     <i class="fa-solid fa-rotate-left"></i>
@@ -295,11 +301,22 @@
 
             <!-- TERMINAL DE DIGITAÇÃO -->
             <div class="w-full panel-style border rounded-2xl p-4 shadow-xl flex flex-col gap-3 relative">
-                <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                <div class="flex justify-between items-center border-b border-white/10 pb-2 gap-2 flex-wrap">
                     <span class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-accent-p">
                         <i class="fa-solid fa-terminal"></i> <span data-i18n="typingTerminalTitle">Terminal de Código</span>
                     </span>
-                    <span id="typingLangBadge" class="text-[10px] code-font font-bold px-2.5 py-0.5 rounded bg-black/50 border border-white/10 text-accent-s">JavaScript</span>
+                    <div class="flex items-center gap-2">
+                        <select id="categorySelect" onchange="game.setCategory(this.value)" class="bg-black/50 border border-white/10 rounded text-[10px] font-bold px-2 py-0.5 text-accent-s focus:outline-none cursor-pointer">
+                            <option value="htmlcss">HTML/CSS</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="php">PHP</option>
+                            <option value="sql">SQL</option>
+                            <option value="typescript">TypeScript</option>
+                        </select>
+                        <span id="levelBadge" class="text-[10px] code-font font-bold px-2 py-0.5 rounded bg-black/50 border border-white/10 text-accent-amb">Nível 1</span>
+                        <span id="typingLangBadge" class="text-[10px] code-font font-bold px-2.5 py-0.5 rounded bg-black/50 border border-white/10 text-accent-s">JavaScript</span>
+                    </div>
                 </div>
 
                 <!-- Snippet Alvo para Digitar (Sempre em Inglês) -->
@@ -340,6 +357,11 @@
                     <button onclick="game.setBuyMultiplier(100)" id="buyAmount100" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60">x100</button>
                     <button onclick="game.setBuyMultiplier('MAX')" id="buyAmountMAX" class="buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60">MAX</button>
                 </div>
+            </div>
+            <div class="px-2 pt-2 bg-black/40 border-b border-white/10 pb-2">
+                <button onclick="game.buyMaxAll()" class="w-full py-1.5 bg-amber-600 hover:bg-amber-500 text-black font-bold text-[11px] rounded-lg transition">
+                    Comprar Máximo em Tudo
+                </button>
             </div>
 
             <!-- Abas da Loja -->
@@ -737,22 +759,59 @@
                     startTime: Date.now(),
 
                     serverOutage: false,
-                    serverFixedCount: 0
+                    serverFixedCount: 0,
+
+                    prestigeMultiplier: 0,
+                    prestigeCount: 0
                 };
 
-                // SNIPPETS DE CÓDIGO (SEMPRE EM INGLÊS)
+                // SNIPPETS DE CÓDIGO POR LINGUAGEM E NÍVEL
                 this.codeSnippets = [
-                    { lang: 'JavaScript', code: 'const total = items.reduce((acc, item) => acc + item.price, 0);' },
-                    { lang: 'JavaScript', code: 'async function fetchData(url) { return await fetch(url).then(r => r.json()); }' },
-                    { lang: 'Python', code: 'def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2)' },
-                    { lang: 'Python', code: 'cleaned_data = [x.strip().lower() for x in raw_lines if x]' },
-                    { lang: 'CSS', code: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));' },
-                    { lang: 'HTML', code: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
-                    { lang: 'Rust', code: 'fn main() { println!("Hello, World!"); let mut count = 0; }' },
-                    { lang: 'SQL', code: 'SELECT u.id, u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id;' },
-                    { lang: 'C++', code: 'std::vector<std::string> tokens = split(input_string, " ");' }
+                    // HTML/CSS
+                    { category: 'htmlcss', level: 1, lang: 'HTML', code: '<button class="btn">Enviar</button>' },
+                    { category: 'htmlcss', level: 1, lang: 'CSS', code: 'body { margin: 0; padding: 0; }' },
+                    { category: 'htmlcss', level: 2, lang: 'CSS', code: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));' },
+                    { category: 'htmlcss', level: 2, lang: 'HTML', code: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
+                    { category: 'htmlcss', level: 3, lang: 'CSS', code: '.card:hover { transform: translateY(-4px); transition: transform 0.2s ease; }' },
+
+                    // PYTHON
+                    { category: 'python', level: 1, lang: 'Python', code: 'print("Hello, World!")' },
+                    { category: 'python', level: 1, lang: 'Python', code: 'nums = [1, 2, 3, 4, 5]' },
+                    { category: 'python', level: 2, lang: 'Python', code: 'def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2)' },
+                    { category: 'python', level: 2, lang: 'Python', code: 'cleaned_data = [x.strip().lower() for x in raw_lines if x]' },
+                    { category: 'python', level: 3, lang: 'Python', code: 'async def fetch_all(urls): return await asyncio.gather(*[fetch(u) for u in urls])' },
+
+                    // JAVA
+                    { category: 'java', level: 1, lang: 'Java', code: 'System.out.println("Hello, World!");' },
+                    { category: 'java', level: 1, lang: 'Java', code: 'int total = a + b;' },
+                    { category: 'java', level: 2, lang: 'Java', code: 'List<String> names = new ArrayList<>();' },
+                    { category: 'java', level: 2, lang: 'Java', code: 'public int sum(int[] nums) { return Arrays.stream(nums).sum(); }' },
+                    { category: 'java', level: 3, lang: 'Java', code: 'public class UserRepository implements Repository<User, Long> { }' },
+
+                    // PHP
+                    { category: 'php', level: 1, lang: 'PHP', code: 'echo "Hello, World!";' },
+                    { category: 'php', level: 1, lang: 'PHP', code: '$total = $price * $quantity;' },
+                    { category: 'php', level: 2, lang: 'PHP', code: 'foreach ($users as $user) { echo $user->name; }' },
+                    { category: 'php', level: 2, lang: 'PHP', code: 'function connect() { return new PDO($dsn, $user, $pass); }' },
+                    { category: 'php', level: 3, lang: 'PHP', code: '$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");' },
+
+                    // SQL
+                    { category: 'sql', level: 1, lang: 'SQL', code: 'SELECT * FROM users;' },
+                    { category: 'sql', level: 1, lang: 'SQL', code: 'INSERT INTO logs (message) VALUES ("ok");' },
+                    { category: 'sql', level: 2, lang: 'SQL', code: 'SELECT u.id, u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id;' },
+                    { category: 'sql', level: 2, lang: 'SQL', code: 'UPDATE products SET stock = stock - 1 WHERE id = ?;' },
+                    { category: 'sql', level: 3, lang: 'SQL', code: 'CREATE INDEX idx_orders_user ON orders (user_id, created_at DESC);' },
+
+                    // TYPESCRIPT
+                    { category: 'typescript', level: 1, lang: 'TypeScript', code: 'const name: string = "Dev";' },
+                    { category: 'typescript', level: 1, lang: 'TypeScript', code: 'let total: number = 0;' },
+                    { category: 'typescript', level: 2, lang: 'TypeScript', code: 'interface User { id: number; name: string; }' },
+                    { category: 'typescript', level: 2, lang: 'TypeScript', code: 'const fetchData = async (url: string): Promise<Response> => fetch(url);' },
+                    { category: 'typescript', level: 3, lang: 'TypeScript', code: 'type Result<T> = { ok: true; value: T } | { ok: false; error: string };' }
                 ];
 
+                this.categories = ['htmlcss', 'python', 'java', 'php', 'sql', 'typescript'];
+                this.selectedCategory = 'htmlcss';
                 this.currentSnippetIndex = 0;
                 this.currentSnippet = this.codeSnippets[0];
 
@@ -865,7 +924,7 @@
 
             // MULTIPLICADORES E CÁLCULOS
             getGlobalMultiplier() {
-                let mult = 1.0;
+                let mult = 1.0 + (this.state.prestigeMultiplier || 0);
                 this.upgradeDefinitions.filter(u => u.multiplier).forEach(u => {
                     const count = this.state.upgrades[u.id] || 0;
                     mult += u.multiplier * count;
@@ -909,11 +968,26 @@
             }
 
             // SISTEMA DE DIGITAÇÃO
+            getUnlockedLevel() {
+                if (this.state.linesCompleted >= 30) return 3;
+                if (this.state.linesCompleted >= 10) return 2;
+                return 1;
+            }
+
+            setCategory(cat) {
+                if (!this.categories.includes(cat)) return;
+                this.selectedCategory = cat;
+                this.loadNextSnippet();
+            }
+
             loadNextSnippet() {
-                this.currentSnippetIndex = (this.currentSnippetIndex + 1) % this.codeSnippets.length;
-                this.currentSnippet = this.codeSnippets[this.currentSnippetIndex];
+                const maxLevel = this.getUnlockedLevel();
+                const pool = this.codeSnippets.filter(s => s.category === this.selectedCategory && s.level <= maxLevel);
+                const list = pool.length ? pool : this.codeSnippets;
+                this.currentSnippet = list[Math.floor(Math.random() * list.length)];
 
                 document.getElementById('typingLangBadge').innerText = this.currentSnippet.lang;
+                document.getElementById('levelBadge').innerText = 'Nível ' + this.currentSnippet.level;
                 const inputEl = document.getElementById('typingInput');
                 inputEl.value = '';
                 inputEl.focus();
@@ -1023,7 +1097,13 @@
 
                 if (this.buyMultiplier === 'MAX') {
                     amountToBuy = this.getMaxAffordableCount(upgrade);
-                    if (amountToBuy <= 0) amountToBuy = 1;
+                    while (amountToBuy > 0 && this.getUpgradeCostForAmount(upgrade, amountToBuy) > this.state.loc) {
+                        amountToBuy--;
+                    }
+                    if (amountToBuy <= 0) {
+                        this.showToast(TRANSLATIONS[this.lang].insufficientLoc, 'error');
+                        return;
+                    }
                     cost = this.getUpgradeCostForAmount(upgrade, amountToBuy);
                 } else {
                     amountToBuy = parseInt(this.buyMultiplier);
@@ -1042,6 +1122,29 @@
                 } else {
                     this.showToast(TRANSLATIONS[this.lang].insufficientLoc, 'error');
                 }
+            }
+
+            buyMaxAll() {
+                let boughtAny = true;
+                let safety = 0;
+                while (boughtAny && safety < 50) {
+                    boughtAny = false;
+                    safety++;
+                    for (const upgrade of this.upgradeDefinitions) {
+                        let amount = this.getMaxAffordableCount(upgrade);
+                        while (amount > 0 && this.getUpgradeCostForAmount(upgrade, amount) > this.state.loc) amount--;
+                        if (amount > 0) {
+                            const cost = this.getUpgradeCostForAmount(upgrade, amount);
+                            this.state.loc -= cost;
+                            this.state.upgrades[upgrade.id] = (this.state.upgrades[upgrade.id] || 0) + amount;
+                            boughtAny = true;
+                        }
+                    }
+                }
+                this.sound.playBuy();
+                this.logConsole('Compra máxima em todos os itens executada.');
+                this.renderShop();
+                this.updateUI();
             }
 
             // INCIDENTES DE SERVIDOR
@@ -1359,6 +1462,29 @@
                 } catch (e) {
                     console.error("Load error", e);
                 }
+            }
+
+            prestige() {
+                const earned = this.state.totalLocEarned || 0;
+                if (earned < 1000) {
+                    this.showToast('Ganhe pelo menos 1.000 LOC totais antes de reiniciar a carreira.', 'error');
+                    return;
+                }
+                const bonus = Math.sqrt(earned) / 100;
+                if (!window.confirm(`Reiniciar sua carreira? Você zera LOC e upgrades, mas ganha +${(bonus * 100).toFixed(1)}% de multiplicador permanente para crescer mais rápido depois.`)) return;
+
+                this.state.prestigeMultiplier = (this.state.prestigeMultiplier || 0) + bonus;
+                this.state.prestigeCount = (this.state.prestigeCount || 0) + 1;
+                this.state.loc = 0;
+                this.state.totalLocEarned = 0;
+                this.state.typingCombo = 1.0;
+                this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
+
+                this.saveGame(false);
+                this.renderShop();
+                this.updateUI();
+                this.showToast(`Nova carreira iniciada! Multiplicador permanente: +${(this.state.prestigeMultiplier * 100).toFixed(1)}%`, 'achievement');
+                this.logConsole('Career restarted with permanent multiplier bonus.');
             }
 
             confirmReset() {

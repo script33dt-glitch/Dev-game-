@@ -166,8 +166,8 @@
                 <button onclick="game.signIn()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition">Entrar</button>
                 <button onclick="game.signUp()" class="flex-1 py-2 bg-black/50 hover:bg-black/70 border border-white/20 text-xs font-bold rounded-lg transition">Criar Conta</button>
             </div>
-            <button disabled title="Requer configuração manual do provedor Google no painel do Supabase" class="w-full py-2 bg-black/30 opacity-40 cursor-not-allowed text-xs font-bold rounded-lg border border-white/10 flex items-center justify-center gap-2">
-                <i class="fa-brands fa-google"></i> Entrar com Google (em breve)
+            <button onclick="game.signInWithGoogle()" class="w-full py-2 bg-white hover:bg-gray-200 text-gray-900 text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-google"></i> Entrar com Google
             </button>
             <p id="authError" class="text-[11px] text-red-400 mt-3 hidden"></p>
             <button onclick="game.skipAuth()" class="w-full mt-3 text-[11px] opacity-50 hover:opacity-80 underline">Jogar sem conta (não sincroniza)</button>
@@ -1528,6 +1528,14 @@
                 if (error) {
                     this.showAuthError(error.message);
                 }
+            }
+
+            async signInWithGoogle() {
+                const { error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin + window.location.pathname }
+                });
+                if (error) this.showAuthError(error.message);
             }
 
             async signOut() {

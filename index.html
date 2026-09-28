@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="vscode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -104,6 +104,7 @@
         .text-accent-purp { color: var(--accent-purple); }
         .text-accent-amb { color: var(--accent-amber); }
         .text-accent-err { color: var(--accent-red); }
+        .bg-accent-p { background-color: var(--accent-primary); }
 
         /* Scrollbar customizado */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -226,6 +227,12 @@
                 <button onclick="game.saveGame(true)" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
                     <i class="fa-solid fa-floppy-disk text-accent-s"></i>
                     <span data-i18n="saveBtn" class="hidden md:inline">Salvar</span>
+                </button>
+
+                <!-- Trocar Conta -->
+                <button onclick="game.switchAccount()" title="Trocar de conta" class="px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
+                    <i class="fa-solid fa-user-group text-accent-s"></i>
+                    <span class="hidden md:inline">Trocar Conta</span>
                 </button>
 
                 <!-- Prestígio -->
@@ -1402,6 +1409,7 @@
             changeTheme(themeName) {
                 this.state.theme = themeName;
                 document.body.setAttribute('data-theme', themeName);
+                document.documentElement.setAttribute('data-theme', themeName);
                 document.getElementById('themeSelect').value = themeName;
                 document.documentElement.style.colorScheme = 'dark';
             }
@@ -1478,169 +1486,3 @@
                 if (session?.user) {
                     await this.onAuthReady(session.user);
                 } else if (localStorage.getItem('dev_typist_skip_auth') !== '1') {
-                    document.getElementById('authOverlay').classList.remove('hidden');
-                } else {
-                    document.getElementById('authOverlay').classList.add('hidden');
-                }
-
-                supabaseClient.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' && session?.user) {
-                        this.onAuthReady(session.user);
-                    } else if (event === 'SIGNED_OUT') {
-                        this.currentUser = null;
-                        document.getElementById('accountBadge').innerText = 'Visitante';
-                    }
-                });
-            }
-
-            async onAuthReady(user) {
-                this.currentUser = user;
-                document.getElementById('authOverlay').classList.add('hidden');
-                document.getElementById('accountBadge').innerText = user.email;
-                await this.loadFromCloud();
-            }
-
-            showAuthError(message) {
-                const el = document.getElementById('authError');
-                el.innerText = message;
-                el.classList.remove('hidden');
-            }
-
-            async signUp() {
-                const email = document.getElementById('authEmail').value.trim();
-                const password = document.getElementById('authPassword').value;
-                if (!email || password.length < 6) {
-                    this.showAuthError('E-mail válido e senha com 6+ caracteres.');
-                    return;
-                }
-                const { error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) {
-                    this.showAuthError(error.message);
-                    return;
-                }
-                this.showAuthError('Conta criada! Se a confirmação por e-mail estiver ativa, confira sua caixa de entrada antes de entrar.');
-            }
-
-            async signIn() {
-                const email = document.getElementById('authEmail').value.trim();
-                const password = document.getElementById('authPassword').value;
-                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) {
-                    this.showAuthError(error.message);
-                }
-            }
-
-            async signInWithGoogle() {
-                const { error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: { redirectTo: window.location.origin + window.location.pathname }
-                });
-                if (error) this.showAuthError(error.message);
-            }
-
-            async signOut() {
-                await supabaseClient.auth.signOut();
-                document.getElementById('authOverlay').classList.remove('hidden');
-            }
-
-            skipAuth() {
-                localStorage.setItem('dev_typist_skip_auth', '1');
-                document.getElementById('authOverlay').classList.add('hidden');
-            }
-
-            accountBadgeClick() {
-                if (this.currentUser) {
-                    if (window.confirm('Sair da conta?')) this.signOut();
-                } else {
-                    document.getElementById('authOverlay').classList.remove('hidden');
-                }
-            }
-
-            async loadFromCloud() {
-                if (!this.currentUser) return;
-                const { data, error } = await supabaseClient
-                    .from('devtypist_saves')
-                    .select('state')
-                    .eq('user_id', this.currentUser.id)
-                    .maybeSingle();
-
-                if (!error && data?.state && Object.keys(data.state).length > 0) {
-                    this.state = { ...this.state, ...data.state };
-                    this.renderShop();
-                    this.renderAchievements();
-                    this.updateUI();
-                    this.logConsole('Progresso carregado da nuvem.');
-                } else {
-                    await this.saveToCloud();
-                }
-            }
-
-            async saveToCloud() {
-                if (!this.currentUser) return;
-                await supabaseClient
-                    .from('devtypist_saves')
-                    .upsert({ user_id: this.currentUser.id, state: this.state, updated_at: new Date().toISOString() });
-            }
-
-            saveGame(manual = false) {
-                try {
-                    const dataToSave = { ...this.state, lang: this.lang };
-                    localStorage.setItem('dev_typist_pro_save', JSON.stringify(dataToSave));
-                    if (this.currentUser) this.saveToCloud();
-                    if (manual) this.showToast(TRANSLATIONS[this.lang].savedSuccess, 'success');
-                } catch (e) {
-                    console.error("Save error", e);
-                }
-            }
-
-            loadGame() {
-                try {
-                    const saved = localStorage.getItem('dev_typist_pro_save');
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        this.state = { ...this.state, ...parsed };
-                        if (parsed.lang) this.lang = parsed.lang;
-                    }
-                } catch (e) {
-                    console.error("Load error", e);
-                }
-            }
-
-            prestige() {
-                const earned = this.state.totalLocEarned || 0;
-                if (earned < 1000) {
-                    this.showToast('Ganhe pelo menos 1.000 LOC totais antes de reiniciar a carreira.', 'error');
-                    return;
-                }
-                const bonus = Math.sqrt(earned) / 100;
-                if (!window.confirm(`Reiniciar sua carreira? Você zera LOC e upgrades, mas ganha +${(bonus * 100).toFixed(1)}% de multiplicador permanente para crescer mais rápido depois.`)) return;
-
-                this.state.prestigeMultiplier = (this.state.prestigeMultiplier || 0) + bonus;
-                this.state.prestigeCount = (this.state.prestigeCount || 0) + 1;
-                this.state.loc = 0;
-                this.state.totalLocEarned = 0;
-                this.state.typingCombo = 1.0;
-                this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
-
-                this.saveGame(false);
-                this.renderShop();
-                this.updateUI();
-                this.showToast(`Nova carreira iniciada! Multiplicador permanente: +${(this.state.prestigeMultiplier * 100).toFixed(1)}%`, 'achievement');
-                this.logConsole('Career restarted with permanent multiplier bonus.');
-            }
-
-            confirmReset() {
-                if (window.confirm(TRANSLATIONS[this.lang].resetConfirm)) {
-                    localStorage.removeItem('dev_typist_pro_save');
-                    window.location.reload();
-                }
-            }
-        }
-
-        let game;
-        window.addEventListener('DOMContentLoaded', () => {
-            game = new DevTypistGame();
-        });
-    </script>
-</body>
-</html>

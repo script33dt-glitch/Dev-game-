@@ -151,6 +151,14 @@
             font-weight: 800;
             z-index: 50;
         }
+        /* TUTORIAL INTERATIVO */
+        .tutorial-highlight {
+            position: relative !important;
+            z-index: 62 !important;
+            box-shadow: 0 0 0 4px rgba(16,185,129,.45), 0 0 30px rgba(16,185,129,.35) !important;
+            border-radius: 16px;
+        }
+        #tutorialOverlay { z-index: 60; }
     </style>
 </head>
 <body data-theme="vscode" class="min-h-screen flex flex-col justify-between relative">
@@ -172,6 +180,22 @@
             </button>
             <p id="authError" class="text-[11px] text-red-400 mt-3 hidden"></p>
             <button onclick="game.skipAuth()" class="w-full mt-3 text-[11px] opacity-50 hover:opacity-80 underline">Jogar sem conta (não sincroniza)</button>
+        </div>
+    </div>
+
+    <!-- TUTORIAL INTERATIVO -->
+    <div id="tutorialOverlay" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="panel-style border rounded-2xl p-5 w-full max-w-md shadow-2xl relative z-[63]">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <span id="tutorialCounter" class="text-[10px] code-font text-accent-s uppercase tracking-wider">Tutorial 1/4</span>
+                <button onclick="game.skipTutorial()" class="text-[11px] opacity-60 hover:opacity-100 underline">Pular tutorial</button>
+            </div>
+            <h2 id="tutorialTitle" class="text-lg font-black text-accent-p mb-2">Bem-vindo ao Dev Typist Pro</h2>
+            <p id="tutorialText" class="text-sm opacity-80 leading-relaxed mb-5"></p>
+            <div class="flex gap-2">
+                <button id="tutorialBackBtn" onclick="game.previousTutorialStep()" class="hidden px-4 py-2 bg-black/40 hover:bg-black/60 border border-white/10 text-xs font-bold rounded-lg transition">Voltar</button>
+                <button id="tutorialNextBtn" onclick="game.nextTutorialStep()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">Próximo</button>
+            </div>
         </div>
     </div>
 
@@ -852,6 +876,15 @@
                 this.lang = 'pt';
                 this.activeTab = 'team'; // 'team', 'skills', 'hardware'
                 this.buyMultiplier = 1; // 1, 10, 100, 'MAX'
+                this.tutorialStep = 0;
+                this.tutorialOpen = false;
+                this.tutorialIsGuest = true;
+                this.tutorialSteps = [
+                    { title: 'Bem-vindo ao Dev Typist Pro', text: 'Seu objetivo é digitar código, ganhar LOC e evoluir sua carreira. Vamos conhecer as partes principais do jogo.', target: null },
+                    { title: 'Terminal de Código', text: 'Digite exatamente o código exibido. Acertos aumentam seu progresso e completar linhas melhora sua evolução.', target: '#typingInput' },
+                    { title: 'Loja de Upgrades', text: 'Use seus LOC para comprar equipe, habilidades de digitação e melhorias de hardware/software.', target: '#shopContainer' },
+                    { title: 'Progresso e conta', text: 'Acompanhe seus números, conquistas e salve seu progresso. Em uma conta, este tutorial aparece somente uma vez.', target: '#accountBadge' }
+                ];
 
                 this.state = {
                     loc: 0,
@@ -869,7 +902,8 @@
                     serverFixedCount: 0,
 
                     prestigeMultiplier: 0,
-                    prestigeCount: 0
+                    prestigeCount: 0,
+                    tutorialCompleted: false
                 };
 
                 // SNIPPETS DE CÓDIGO POR LINGUAGEM E NÍVEL
@@ -1567,6 +1601,7 @@
                     document.getElementById('authOverlay').classList.remove('hidden');
                 } else {
                     document.getElementById('authOverlay').classList.add('hidden');
+                    this.startTutorial(true);
                 }
 
                 supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -1575,6 +1610,7 @@
                     } else if (event === 'SIGNED_OUT') {
                         this.currentUser = null;
                         document.getElementById('accountBadge').innerText = 'Visitante';
+                        this.closeTutorial();
                     }
                 });
             }
@@ -1584,6 +1620,8 @@
                 document.getElementById('authOverlay').classList.add('hidden');
                 document.getElementById('accountBadge').innerText = user.email;
                 await this.loadFromCloud();
+                if (!this.state.tutorialCompleted) this.startTutorial(false);
+                else this.closeTutorial();
             }
 
             showAuthError(message) {
@@ -1660,6 +1698,77 @@
             skipAuth() {
                 localStorage.setItem('dev_typist_skip_auth', '1');
                 document.getElementById('authOverlay').classList.add('hidden');
+                this.startTutorial(true);
+            }
+
+            startTutorial(isGuest = !this.currentUser) {
+                this.tutorialStep = 0;
+                this.tutorialOpen = true;
+                this.tutorialIsGuest = isGuest;
+                document.getElementById('tutorialOverlay').classList.remove('hidden');
+                this.renderTutorialStep();
+            }
+
+            renderTutorialStep() {
+                if (!this.tutorialOpen) return;
+                document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+                const step = this.tutorialSteps[this.tutorialStep];
+                const total = this.tutorialSteps.length;
+                document.getElementById('tutorialCounter').innerText = `Tutorial ${this.tutorialStep + 1}/${total}`;
+                document.getElementById('tutorialTitle').innerText = step.title;
+                document.getElementById('tutorialText').innerText = step.text;
+                document.getElementById('tutorialBackBtn').classList.toggle('hidden', this.tutorialStep === 0);
+                document.getElementById('tutorialNextBtn').innerText = this.tutorialStep === total - 1 ? 'Concluir tutorial' : 'Próximo';
+                if (step.target) {
+                    const target = document.querySelector(step.target);
+                    if (target) {
+                        target.classList.add('tutorial-highlight');
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+
+            nextTutorialStep() {
+                if (this.tutorialStep < this.tutorialSteps.length - 1) {
+                    this.tutorialStep++;
+                    this.renderTutorialStep();
+                    return;
+                }
+                this.finishTutorial();
+            }
+
+            previousTutorialStep() {
+                if (this.tutorialStep <= 0) return;
+                this.tutorialStep--;
+                this.renderTutorialStep();
+            }
+
+            async finishTutorial() {
+                await this.completeTutorialForCurrentEntry();
+                this.closeTutorial();
+            }
+
+            async skipTutorial() {
+                await this.completeTutorialForCurrentEntry();
+                this.closeTutorial();
+            }
+
+            async completeTutorialForCurrentEntry() {
+                if (!this.currentUser || this.tutorialIsGuest) return;
+                this.state.tutorialCompleted = true;
+                await this.saveToCloud();
+                try {
+                    const dataToSave = { ...this.state, lang: this.lang };
+                    localStorage.setItem('dev_typist_pro_save', JSON.stringify(dataToSave));
+                } catch (e) {
+                    console.error('Tutorial local save error', e);
+                }
+            }
+
+            closeTutorial() {
+                this.tutorialOpen = false;
+                document.getElementById('tutorialOverlay').classList.add('hidden');
+                document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             }
 
             accountBadgeClick() {
@@ -1685,6 +1794,7 @@
                     this.updateUI();
                     this.logConsole('Progresso carregado da nuvem.');
                 } else {
+                    this.state.tutorialCompleted = false;
                     await this.saveToCloud();
                 }
             }

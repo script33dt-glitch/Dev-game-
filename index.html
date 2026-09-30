@@ -159,6 +159,15 @@
             border-radius: 16px;
         }
         #tutorialOverlay { z-index: 60; }
+
+        /* ===== DEV GAMER STUDY HUB (adição) ===== */
+        .study-card { background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.10); border-radius: 14px; }
+        .study-progress { height: 8px; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; overflow: hidden; }
+        .study-progress > div { height: 100%; background: var(--accent-primary); transition: width .25s ease; }
+        .challenge-option { width: 100%; text-align: left; padding: .7rem .8rem; border-radius: .7rem; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.30); transition: .18s; }
+        .challenge-option:hover { border-color: var(--accent-primary); background: rgba(16,185,129,.10); }
+        .dev-combo-glow { box-shadow: 0 0 22px rgba(16,185,129,.25); }
+
     </style>
 </head>
 <body data-theme="vscode" class="min-h-screen flex flex-col justify-between relative">
@@ -442,7 +451,108 @@
             </div>
         </section>
 
+
+        <!-- ===== DEV GAMER: CENTRAL DE ESTUDO (ADIÇÃO) ===== -->
+        <section id="studyHub" class="lg:col-span-12 panel-style border rounded-2xl p-4 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-wider text-accent-p flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap"></i> Central de Estudo
+                    </h2>
+                    <p class="text-[11px] opacity-65 mt-1">Jogue, pratique e transforme digitação em conhecimento de programação.</p>
+                </div>
+                <button onclick="game.openChallenge()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition">
+                    <i class="fa-solid fa-code"></i> DESAFIO RÁPIDO
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div class="study-card p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] uppercase font-bold opacity-65">Carreira</span>
+                        <i class="fa-solid fa-briefcase text-accent-amb"></i>
+                    </div>
+                    <div id="careerTitle" class="font-black text-lg text-accent-amb">Iniciante</div>
+                    <div class="flex justify-between text-[10px] mt-2"><span id="levelDisplay">Nível 1</span><span id="xpDisplay">0 / 100 XP</span></div>
+                    <div class="study-progress mt-1"><div id="xpBar" style="width:0%"></div></div>
+                </div>
+
+                <div class="study-card p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] uppercase font-bold opacity-65">Missão diária</span>
+                        <i class="fa-solid fa-calendar-check text-accent-s"></i>
+                    </div>
+                    <div id="dailyMissionText" class="text-xs font-bold">Complete 5 linhas de código</div>
+                    <div class="flex justify-between text-[10px] mt-2"><span id="dailyProgress">0 / 5</span><span id="streakDisplay">🔥 1 dia</span></div>
+                    <div class="study-progress mt-1"><div id="dailyBar" style="width:0%"></div></div>
+                </div>
+
+                <div class="study-card p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] uppercase font-bold opacity-65">Domínio atual</span>
+                        <i class="fa-solid fa-brain text-accent-purp"></i>
+                    </div>
+                    <div id="masteryLanguage" class="font-black text-lg text-accent-purp">HTML/CSS</div>
+                    <div class="flex justify-between text-[10px] mt-2"><span id="masteryLevel">Domínio Nv. 1</span><span id="masteryXP">0 pts</span></div>
+                    <div class="study-progress mt-1"><div id="masteryBar" style="width:0%"></div></div>
+                </div>
+
+                <div class="study-card p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] uppercase font-bold opacity-65">Combo Dev</span>
+                        <i class="fa-solid fa-fire text-accent-err"></i>
+                    </div>
+                    <div id="devComboDisplay" class="font-black text-lg text-accent-p">x1.0</div>
+                    <p class="text-[10px] opacity-65 mt-2">Acertar desafios sem dica aumenta o multiplicador de XP.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
+                <div class="study-card p-4">
+                    <h3 class="text-xs font-black text-accent-s mb-2"><i class="fa-solid fa-book-open"></i> Microlição</h3>
+                    <p id="lessonTitle" class="text-xs font-bold mb-1">Variáveis</p>
+                    <p id="lessonText" class="text-[11px] opacity-70 leading-relaxed">Variáveis guardam valores para serem reutilizados pelo programa.</p>
+                    <button onclick="game.nextLesson()" class="mt-3 text-[10px] font-bold underline opacity-70 hover:opacity-100">Próxima microlição</button>
+                </div>
+
+                <div class="study-card p-4">
+                    <h3 class="text-xs font-black text-accent-amb mb-2"><i class="fa-solid fa-bug"></i> Caça-bugs</h3>
+                    <p class="text-[11px] opacity-70">Encontre erros simples de lógica ou sintaxe e ganhe XP extra.</p>
+                    <button onclick="game.openBugChallenge()" class="mt-3 px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-black text-[10px] font-black">CORRIGIR UM BUG</button>
+                </div>
+
+                <div class="study-card p-4">
+                    <h3 class="text-xs font-black text-accent-purp mb-2"><i class="fa-solid fa-diagram-project"></i> Projeto de carreira</h3>
+                    <p id="projectText" class="text-[11px] opacity-70">Projeto 1: complete 10 linhas e 2 desafios para criar seu primeiro mini app.</p>
+                    <div class="study-progress mt-3"><div id="projectBar" style="width:0%"></div></div>
+                    <p id="projectProgress" class="text-[10px] mt-1 opacity-65">0%</p>
+                </div>
+            </div>
+        </section>
+
     </main>
+
+
+    <!-- DESAFIOS EDUCACIONAIS -->
+    <div id="challengeOverlay" class="hidden fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="panel-style border rounded-2xl p-5 w-full max-w-xl shadow-2xl">
+            <div class="flex justify-between items-start gap-3 mb-4">
+                <div>
+                    <div id="challengeType" class="text-[10px] uppercase tracking-wider font-black text-accent-s">Desafio</div>
+                    <h2 id="challengeTitle" class="text-lg font-black text-accent-p mt-1">Entenda o código</h2>
+                </div>
+                <button onclick="game.closeChallenge()" class="opacity-60 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <pre id="challengeCode" class="bg-black/60 border border-white/10 rounded-xl p-4 code-font text-xs overflow-x-auto whitespace-pre-wrap mb-4"></pre>
+            <p id="challengeQuestion" class="text-sm font-bold mb-3"></p>
+            <div id="challengeOptions" class="space-y-2"></div>
+            <div class="flex justify-between items-center mt-4">
+                <button id="challengeHintBtn" onclick="game.showChallengeHint()" class="text-[10px] underline opacity-65 hover:opacity-100">Usar dica</button>
+                <span class="text-[10px] opacity-60">Acerto sem dica = mais XP + Combo Dev</span>
+            </div>
+            <p id="challengeHint" class="hidden mt-3 text-xs text-accent-amb bg-black/30 border border-white/10 rounded-lg p-3"></p>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="panel-style border-t py-2.5 text-center text-xs opacity-60 z-10">
@@ -810,14 +920,7 @@
                 this.ctx = null;
                 this.enabled = true;
                 this.playing = false;
-                this.noteIndex = 0;
-                this.currentTrack = null;
-                this.tracks = [
-                    [392, 523, 659, 523, 392, 523, 659, 784],
-                    [440, 440, 523, 440, 349, 440, 523, 587],
-                    [523, 587, 659, 587, 523, 440, 392, 440],
-                    [349, 392, 440, 392, 349, 294, 349, 392]
-                ];
+                this.step = 0;
             }
 
             init() {
@@ -827,37 +930,34 @@
                 }
             }
 
-            pickTrack() {
-                this.currentTrack = this.tracks[Math.floor(Math.random() * this.tracks.length)];
-                this.noteIndex = 0;
-            }
-
-            playNote(freq) {
-                if (!this.ctx) return;
+            playBeat() {
+                if (!this.ctx || !this.enabled) return;
+                const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+
+                // Batida/beep minimalista, sem melodia.
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(this.step % 4 === 0 ? 95 : 70, now);
+                osc.frequency.exponentialRampToValueAtTime(48, now + 0.08);
+                gain.gain.setValueAtTime(this.step % 4 === 0 ? 0.055 : 0.025, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.10);
+
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.11);
+                this.step++;
             }
 
             start() {
                 if (this.playing) return;
                 this.init();
                 if (!this.ctx) return;
+                if (this.ctx.state === 'suspended') this.ctx.resume();
                 this.playing = true;
-                this.pickTrack();
-                this.loopId = setInterval(() => {
-                    if (!this.enabled) return;
-                    this.playNote(this.currentTrack[this.noteIndex]);
-                    this.noteIndex++;
-                    if (this.noteIndex >= this.currentTrack.length) this.pickTrack();
-                }, 400);
+                this.playBeat();
+                this.loopId = setInterval(() => this.playBeat(), 650);
             }
 
             toggle() {
@@ -903,7 +1003,19 @@
 
                     prestigeMultiplier: 0,
                     prestigeCount: 0,
-                    tutorialCompleted: false
+                    tutorialCompleted: false,
+
+                    // Progressão educacional
+                    xp: 0,
+                    devLevel: 1,
+                    devCombo: 1.0,
+                    challengesCompleted: 0,
+                    correctChallenges: 0,
+                    languageMastery: {},
+                    daily: { date: '', lines: 0, challenges: 0, claimed: false },
+                    streak: 0,
+                    lastStudyDate: '',
+                    projectStage: 1
                 };
 
                 // SNIPPETS DE CÓDIGO POR LINGUAGEM E NÍVEL
@@ -988,6 +1100,33 @@
                 this.goals = [100, 1000, 10000, 100000, 1000000];
 
                 this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
+
+                this.studyLessons = [
+                    { title: 'Variáveis', text: 'Variáveis guardam valores para o programa reutilizar. Ex.: const nome = "Dev";' },
+                    { title: 'Condições', text: 'if executa um bloco quando uma condição é verdadeira; else trata o caminho alternativo.' },
+                    { title: 'Loops', text: 'Loops repetem tarefas. for é útil quando você sabe quantas repetições precisa fazer.' },
+                    { title: 'Funções', text: 'Funções agrupam uma tarefa reutilizável. Elas podem receber parâmetros e retornar valores.' },
+                    { title: 'Arrays/Listas', text: 'Arrays e listas guardam vários valores em uma única estrutura e podem ser percorridos.' },
+                    { title: 'SQL básico', text: 'SELECT consulta dados; WHERE filtra linhas; INSERT cria registros; UPDATE altera registros.' }
+                ];
+                this.lessonIndex = 0;
+
+                this.studyChallenges = [
+                    { type:'Entenda o código', title:'Saída do programa', code:'const x = 2 + 3;\\nconsole.log(x);', question:'O que será exibido?', options:['23','5','2 + 3','Erro'], answer:1, hint:'O operador + soma dois números.' },
+                    { type:'Complete a lógica', title:'Condição', code:'let idade = 18;\\nif (idade >= 18) { ... }', question:'O que a condição verifica?', options:['Se idade é texto','Se idade é pelo menos 18','Se idade é menor que 18','Se idade é vazia'], answer:1, hint:'Observe o operador >=.' },
+                    { type:'Python', title:'Lista', code:'nums = [1, 2, 3]\\nprint(len(nums))', question:'Qual é a saída?', options:['2','3','6','nums'], answer:1, hint:'len() retorna a quantidade de itens.' },
+                    { type:'SQL', title:'Consulta', code:'SELECT name FROM users WHERE active = 1;', question:'O que essa consulta faz?', options:['Apaga usuários','Cria usuário','Busca nomes de usuários ativos','Atualiza todos os nomes'], answer:2, hint:'SELECT lê dados e WHERE filtra.' },
+                    { type:'TypeScript', title:'Tipo', code:'const score: number = 10;', question:'Qual tipo foi definido para score?', options:['string','boolean','number','array'], answer:2, hint:'O tipo aparece depois dos dois-pontos.' }
+                ];
+
+                this.bugChallenges = [
+                    { type:'Caça-bugs', title:'Bug em JavaScript', code:'const nome = "Ana"\\nconsole.log(nome)', question:'Qual correção deixa o estilo da linha mais consistente?', options:['Remover aspas','Adicionar ; após "Ana"','Trocar const por HTML','Apagar console.log'], answer:1, hint:'Neste jogo os snippets JS usam ; no final das instruções.' },
+                    { type:'Caça-bugs', title:'Bug em Python', code:'if idade >= 18\\n    print("Maior")', question:'O que está faltando no if?', options:[';','{}',':','SELECT'], answer:2, hint:'Em Python, blocos condicionais começam com :.' },
+                    { type:'Caça-bugs', title:'Bug em SQL', code:'SELEC * FROM users;', question:'Qual palavra está escrita incorretamente?', options:['FROM','users','SELEC','*'], answer:2, hint:'O comando de consulta começa com SELECT.' }
+                ];
+                this.currentChallenge = null;
+                this.challengeUsedHint = false;
+
                 this.init();
             }
 
@@ -1000,6 +1139,8 @@
                 this.renderShop();
                 this.renderAchievements();
                 this.updateUI();
+                this.initStudySystem();
+                this.updateStudyUI();
 
                 // Manter foco no input de digitação para fluidez do jogo
                 const inputEl = document.getElementById('typingInput');
@@ -1121,6 +1262,7 @@
                 if (!this.categories.includes(cat)) return;
                 this.selectedCategory = cat;
                 this.loadNextSnippet();
+                this.updateStudyUI();
             }
 
             loadNextSnippet() {
@@ -1200,6 +1342,12 @@
                     const dict = TRANSLATIONS[this.lang];
                     this.showToast(`${dict.lineCompletedToast} +${this.formatNumber(lineReward)} LOC`, 'success');
                     this.logConsole(`Compiled [${this.currentSnippet.lang}]: Line completed cleanly.`);
+
+                    // Recompensa educacional: XP, domínio e missão diária.
+                    this.addStudyXP(8, 'linha concluída');
+                    this.addLanguageMastery(this.selectedCategory, 5);
+                    this.registerDailyProgress('line');
+                    this.updateProjectProgress();
 
                     this.loadNextSnippet();
                 }
@@ -1779,6 +1927,209 @@
                 }
             }
 
+
+            // ===== SISTEMA EDUCACIONAL / PROGRESSÃO =====
+            initStudySystem() {
+                if (!this.state.languageMastery || typeof this.state.languageMastery !== 'object') this.state.languageMastery = {};
+                if (!this.state.daily || typeof this.state.daily !== 'object') this.state.daily = { date:'', lines:0, challenges:0, claimed:false };
+                this.categories.forEach(c => {
+                    if (typeof this.state.languageMastery[c] !== 'number') this.state.languageMastery[c] = 0;
+                });
+
+                const today = new Date().toISOString().slice(0,10);
+                if (this.state.daily.date !== today) {
+                    this.state.daily = { date: today, lines: 0, challenges: 0, claimed: false };
+                }
+
+                if (this.state.lastStudyDate !== today) {
+                    if (this.state.lastStudyDate) {
+                        const a = new Date(this.state.lastStudyDate + 'T00:00:00');
+                        const b = new Date(today + 'T00:00:00');
+                        const diff = Math.round((b-a)/86400000);
+                        this.state.streak = diff === 1 ? (this.state.streak || 0) + 1 : 1;
+                    } else {
+                        this.state.streak = 1;
+                    }
+                    this.state.lastStudyDate = today;
+                }
+            }
+
+            getXPNeeded(level = this.state.devLevel || 1) {
+                return Math.floor(100 * Math.pow(1.35, Math.max(0, level - 1)));
+            }
+
+            getCareerTitle() {
+                const l = this.state.devLevel || 1;
+                if (l >= 25) return 'Tech Lead';
+                if (l >= 18) return 'Dev Sênior';
+                if (l >= 12) return 'Dev Pleno';
+                if (l >= 6) return 'Dev Júnior';
+                if (l >= 3) return 'Estagiário';
+                return 'Iniciante';
+            }
+
+            addStudyXP(base, reason='') {
+                const mult = Math.max(1, this.state.devCombo || 1);
+                const gained = Math.max(1, Math.round(base * mult));
+                this.state.xp = (this.state.xp || 0) + gained;
+
+                let needed = this.getXPNeeded();
+                while (this.state.xp >= needed) {
+                    this.state.xp -= needed;
+                    this.state.devLevel = (this.state.devLevel || 1) + 1;
+                    this.showToast(`⬆️ Nível ${this.state.devLevel}: ${this.getCareerTitle()}!`, 'achievement');
+                    needed = this.getXPNeeded();
+                }
+                this.updateStudyUI();
+                return gained;
+            }
+
+            addLanguageMastery(category, amount) {
+                if (!this.state.languageMastery) this.state.languageMastery = {};
+                this.state.languageMastery[category] = (this.state.languageMastery[category] || 0) + amount;
+            }
+
+            registerDailyProgress(kind) {
+                this.initStudySystem();
+                if (kind === 'line') this.state.daily.lines++;
+                if (kind === 'challenge') this.state.daily.challenges++;
+                if (!this.state.daily.claimed && this.state.daily.lines >= 5 && this.state.daily.challenges >= 1) {
+                    this.state.daily.claimed = true;
+                    this.state.loc += 250;
+                    this.state.totalLocEarned += 250;
+                    this.addStudyXP(50, 'missão diária');
+                    this.showToast('📅 Missão diária concluída! +250 LOC +50 XP', 'achievement');
+                }
+                this.updateStudyUI();
+            }
+
+            updateStudyUI() {
+                const level = this.state.devLevel || 1;
+                const xp = this.state.xp || 0;
+                const need = this.getXPNeeded(level);
+                const career = document.getElementById('careerTitle');
+                if (!career) return;
+
+                career.innerText = this.getCareerTitle();
+                document.getElementById('levelDisplay').innerText = `Nível ${level}`;
+                document.getElementById('xpDisplay').innerText = `${xp} / ${need} XP`;
+                document.getElementById('xpBar').style.width = `${Math.min(100, xp/need*100)}%`;
+
+                const d = this.state.daily || {lines:0,challenges:0};
+                document.getElementById('dailyMissionText').innerText = 'Complete 5 linhas + 1 desafio';
+                document.getElementById('dailyProgress').innerText = `${Math.min(d.lines||0,5)}/5 linhas • ${Math.min(d.challenges||0,1)}/1 desafio`;
+                const dailyPct = Math.min(100, ((Math.min(d.lines||0,5)/5)*70) + ((Math.min(d.challenges||0,1))*30));
+                document.getElementById('dailyBar').style.width = `${dailyPct}%`;
+                document.getElementById('streakDisplay').innerText = `🔥 ${this.state.streak || 1} dia${(this.state.streak||1) === 1 ? '' : 's'}`;
+
+                const cat = this.selectedCategory || 'htmlcss';
+                const names = {htmlcss:'HTML/CSS',python:'Python',java:'Java',php:'PHP',sql:'SQL',typescript:'TypeScript'};
+                const pts = (this.state.languageMastery && this.state.languageMastery[cat]) || 0;
+                const masteryLevel = Math.floor(pts/100)+1;
+                document.getElementById('masteryLanguage').innerText = names[cat] || cat;
+                document.getElementById('masteryLevel').innerText = `Domínio Nv. ${masteryLevel}`;
+                document.getElementById('masteryXP').innerText = `${pts} pts`;
+                document.getElementById('masteryBar').style.width = `${pts%100}%`;
+
+                document.getElementById('devComboDisplay').innerText = `x${(this.state.devCombo || 1).toFixed(1)}`;
+                this.updateProjectProgress(false);
+            }
+
+            nextLesson() {
+                this.lessonIndex = (this.lessonIndex + 1) % this.studyLessons.length;
+                const lesson = this.studyLessons[this.lessonIndex];
+                document.getElementById('lessonTitle').innerText = lesson.title;
+                document.getElementById('lessonText').innerText = lesson.text;
+            }
+
+            openChallenge() {
+                this.showStudyChallenge(this.studyChallenges[Math.floor(Math.random()*this.studyChallenges.length)]);
+            }
+
+            openBugChallenge() {
+                this.showStudyChallenge(this.bugChallenges[Math.floor(Math.random()*this.bugChallenges.length)]);
+            }
+
+            showStudyChallenge(challenge) {
+                this.currentChallenge = challenge;
+                this.challengeUsedHint = false;
+                document.getElementById('challengeType').innerText = challenge.type;
+                document.getElementById('challengeTitle').innerText = challenge.title;
+                document.getElementById('challengeCode').innerText = challenge.code.replace(/\\n/g, '\n');
+                document.getElementById('challengeQuestion').innerText = challenge.question;
+                document.getElementById('challengeHint').classList.add('hidden');
+                document.getElementById('challengeHintBtn').classList.remove('hidden');
+
+                const box = document.getElementById('challengeOptions');
+                box.innerHTML = '';
+                challenge.options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'challenge-option text-xs';
+                    btn.innerText = option;
+                    btn.onclick = () => this.answerChallenge(index);
+                    box.appendChild(btn);
+                });
+                document.getElementById('challengeOverlay').classList.remove('hidden');
+            }
+
+            showChallengeHint() {
+                if (!this.currentChallenge) return;
+                this.challengeUsedHint = true;
+                const el = document.getElementById('challengeHint');
+                el.innerText = '💡 ' + this.currentChallenge.hint;
+                el.classList.remove('hidden');
+                document.getElementById('challengeHintBtn').classList.add('hidden');
+            }
+
+            answerChallenge(index) {
+                if (!this.currentChallenge) return;
+                if (index === this.currentChallenge.answer) {
+                    const noHint = !this.challengeUsedHint;
+                    this.state.challengesCompleted = (this.state.challengesCompleted || 0) + 1;
+                    this.state.correctChallenges = (this.state.correctChallenges || 0) + 1;
+                    if (noHint) this.state.devCombo = Math.min(3, (this.state.devCombo || 1) + 0.1);
+                    const xp = this.addStudyXP(noHint ? 35 : 20, 'desafio');
+                    this.addLanguageMastery(this.selectedCategory, noHint ? 15 : 8);
+                    this.registerDailyProgress('challenge');
+                    this.showToast(`🧠 Resposta certa! +${xp} XP${noHint ? ' • Combo Dev ↑' : ''}`, 'success');
+                    this.closeChallenge();
+                    this.updateProjectProgress();
+                } else {
+                    this.state.devCombo = Math.max(1, (this.state.devCombo || 1) - 0.1);
+                    this.showToast('Quase! Observe o código e tente novamente.', 'error');
+                    this.updateStudyUI();
+                }
+            }
+
+            closeChallenge() {
+                document.getElementById('challengeOverlay').classList.add('hidden');
+                this.currentChallenge = null;
+            }
+
+            updateProjectProgress(reward = true) {
+                const lines = this.state.linesCompleted || 0;
+                const challenges = this.state.challengesCompleted || 0;
+                const stage = this.state.projectStage || 1;
+                const reqLines = stage * 10;
+                const reqChallenges = stage * 2;
+                const pct = Math.min(100, ((Math.min(lines,reqLines)/reqLines)*60) + ((Math.min(challenges,reqChallenges)/reqChallenges)*40));
+
+                const bar = document.getElementById('projectBar');
+                if (!bar) return;
+                bar.style.width = `${pct}%`;
+                document.getElementById('projectText').innerText = `Projeto ${stage}: complete ${reqLines} linhas e ${reqChallenges} desafios para entregar um mini projeto.`;
+                document.getElementById('projectProgress').innerText = `${Math.floor(pct)}% • ${Math.min(lines,reqLines)}/${reqLines} linhas • ${Math.min(challenges,reqChallenges)}/${reqChallenges} desafios`;
+
+                if (reward && pct >= 100) {
+                    this.state.projectStage = stage + 1;
+                    this.state.loc += 500 * stage;
+                    this.state.totalLocEarned += 500 * stage;
+                    this.addStudyXP(100 * stage, 'projeto');
+                    this.showToast(`🚀 Projeto ${stage} entregue! +${500*stage} LOC`, 'achievement');
+                    this.updateStudyUI();
+                }
+            }
+
             async loadFromCloud() {
                 if (!this.currentUser) return;
                 const { data, error } = await supabaseClient
@@ -1792,6 +2143,8 @@
                     this.renderShop();
                     this.renderAchievements();
                     this.updateUI();
+                    this.initStudySystem();
+                    this.updateStudyUI();
                     this.logConsole('Progresso carregado da nuvem.');
                 } else {
                     this.state.tutorialCompleted = false;

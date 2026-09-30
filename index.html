@@ -599,7 +599,7 @@
                 achievementsTitle: "Logros",
                 locTotalLabel: "Líneas Totales de Código (LOC)",
                 comboLabel: "Combo Escritura",
-                linesCompletadLabel: "Líneas Completadas",
+                linesCompletedLabel: "Líneas Completadas",
                 typingTerminalTitle: "Terminal de Código",
                 typingHint: "💡 Escribe el código exactamente como se muestra. ¡Cada carácter otorga LOC según tu combo!",
                 buyAmountLabel: "Lote:",
@@ -641,3 +641,1121 @@
                 up_ssd_nvme_name: "Almacenamiento NVMe Gen5",
                 up_ssd_nvme_desc: "+15% Multiplicador Global",
                 up_cloud_cluster_name: "Cluster Kubernetes",
+                up_cloud_cluster_desc: "+35% Multiplicador Global",
+                up_rust_refactor_name: "Refactorización a Rust",
+                up_rust_refactor_desc: "+75% Multiplicador Global de Rendimiento",
+
+                // Logros
+                ach_first_line_title: "Primera Línea",
+                ach_first_line_desc: "Escribe tu primera línea de código en la terminal.",
+                ach_typing_master_title: "Maestro del Teclado",
+                ach_typing_master_desc: "Escribe 15 líneas de código completas.",
+                ach_speed_demon_title: "Velocidad Pura",
+                ach_speed_demon_desc: "Alcanza un combo de escritura de 2.0x.",
+                ach_server_hero_title: "Héroe de Guardia",
+                ach_server_hero_desc: "Resuelve una caída crítica del servidor."
+            }
+        };
+
+        /**
+         * GERENCIADOR DE SINTETIZADOR DE ÁUDIO (Web Audio API)
+         */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+
+            playKeyStroke() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(650 + Math.random() * 150, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.025);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.025);
+            }
+
+            playKeyError() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.07);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.07);
+            }
+
+            playLineComplete() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.05); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.10); // G5
+
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.22);
+            }
+
+            playBuy() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(640, this.ctx.currentTime + 0.07);
+
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+
+            playAlarm() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(700, now);
+                osc.frequency.setValueAtTime(350, now + 0.08);
+
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.2);
+            }
+        }
+
+        /**
+         * TOCADOR DE MÚSICA DE FUNDO (chiptune original, gerado por código)
+         */
+        class MusicPlayer {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+                this.playing = false;
+                this.noteIndex = 0;
+                this.currentTrack = null;
+                this.tracks = [
+                    [392, 523, 659, 523, 392, 523, 659, 784],
+                    [440, 440, 523, 440, 349, 440, 523, 587],
+                    [523, 587, 659, 587, 523, 440, 392, 440],
+                    [349, 392, 440, 392, 349, 294, 349, 392]
+                ];
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+
+            pickTrack() {
+                this.currentTrack = this.tracks[Math.floor(Math.random() * this.tracks.length)];
+                this.noteIndex = 0;
+            }
+
+            playNote(freq) {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.35);
+            }
+
+            start() {
+                if (this.playing) return;
+                this.init();
+                if (!this.ctx) return;
+                this.playing = true;
+                this.pickTrack();
+                this.loopId = setInterval(() => {
+                    if (!this.enabled) return;
+                    this.playNote(this.currentTrack[this.noteIndex]);
+                    this.noteIndex++;
+                    if (this.noteIndex >= this.currentTrack.length) this.pickTrack();
+                }, 400);
+            }
+
+            toggle() {
+                this.enabled = !this.enabled;
+                return this.enabled;
+            }
+        }
+
+        /**
+         * CLASSE PRINCIPAL - DEV TYPIST PRO
+         */
+        class DevTypistGame {
+            constructor() {
+                this.sound = new SoundFX();
+                this.music = new MusicPlayer();
+                this.lang = 'pt';
+                this.activeTab = 'team'; // 'team', 'skills', 'hardware'
+                this.buyMultiplier = 1; // 1, 10, 100, 'MAX'
+
+                this.state = {
+                    loc: 0,
+                    totalLocEarned: 0,
+                    theme: 'vscode',
+                    upgrades: {},
+                    achievements: {},
+
+                    totalCharactersTyped: 0,
+                    linesCompleted: 0,
+                    typingCombo: 1.0,
+                    startTime: Date.now(),
+
+                    serverOutage: false,
+                    serverFixedCount: 0,
+
+                    prestigeMultiplier: 0,
+                    prestigeCount: 0
+                };
+
+                // SNIPPETS DE CÓDIGO POR LINGUAGEM E NÍVEL
+                this.codeSnippets = [
+                    // HTML/CSS
+                    { category: 'htmlcss', level: 1, lang: 'HTML', code: '<button class="btn">Enviar</button>' },
+                    { category: 'htmlcss', level: 1, lang: 'CSS', code: 'body { margin: 0; padding: 0; }' },
+                    { category: 'htmlcss', level: 2, lang: 'CSS', code: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));' },
+                    { category: 'htmlcss', level: 2, lang: 'HTML', code: '<meta name="viewport" content="width=device-width, initial-scale=1.0">' },
+                    { category: 'htmlcss', level: 3, lang: 'CSS', code: '.card:hover { transform: translateY(-4px); transition: transform 0.2s ease; }' },
+
+                    // PYTHON
+                    { category: 'python', level: 1, lang: 'Python', code: 'print("Hello, World!")' },
+                    { category: 'python', level: 1, lang: 'Python', code: 'nums = [1, 2, 3, 4, 5]' },
+                    { category: 'python', level: 2, lang: 'Python', code: 'def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2)' },
+                    { category: 'python', level: 2, lang: 'Python', code: 'cleaned_data = [x.strip().lower() for x in raw_lines if x]' },
+                    { category: 'python', level: 3, lang: 'Python', code: 'async def fetch_all(urls): return await asyncio.gather(*[fetch(u) for u in urls])' },
+
+                    // JAVA
+                    { category: 'java', level: 1, lang: 'Java', code: 'System.out.println("Hello, World!");' },
+                    { category: 'java', level: 1, lang: 'Java', code: 'int total = a + b;' },
+                    { category: 'java', level: 2, lang: 'Java', code: 'List<String> names = new ArrayList<>();' },
+                    { category: 'java', level: 2, lang: 'Java', code: 'public int sum(int[] nums) { return Arrays.stream(nums).sum(); }' },
+                    { category: 'java', level: 3, lang: 'Java', code: 'public class UserRepository implements Repository<User, Long> { }' },
+
+                    // PHP
+                    { category: 'php', level: 1, lang: 'PHP', code: 'echo "Hello, World!";' },
+                    { category: 'php', level: 1, lang: 'PHP', code: '$total = $price * $quantity;' },
+                    { category: 'php', level: 2, lang: 'PHP', code: 'foreach ($users as $user) { echo $user->name; }' },
+                    { category: 'php', level: 2, lang: 'PHP', code: 'function connect() { return new PDO($dsn, $user, $pass); }' },
+                    { category: 'php', level: 3, lang: 'PHP', code: '$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");' },
+
+                    // SQL
+                    { category: 'sql', level: 1, lang: 'SQL', code: 'SELECT * FROM users;' },
+                    { category: 'sql', level: 1, lang: 'SQL', code: 'INSERT INTO logs (message) VALUES ("ok");' },
+                    { category: 'sql', level: 2, lang: 'SQL', code: 'SELECT u.id, u.name, COUNT(o.id) FROM users u JOIN orders o ON u.id = o.user_id;' },
+                    { category: 'sql', level: 2, lang: 'SQL', code: 'UPDATE products SET stock = stock - 1 WHERE id = ?;' },
+                    { category: 'sql', level: 3, lang: 'SQL', code: 'CREATE INDEX idx_orders_user ON orders (user_id, created_at DESC);' },
+
+                    // TYPESCRIPT
+                    { category: 'typescript', level: 1, lang: 'TypeScript', code: 'const name: string = "Dev";' },
+                    { category: 'typescript', level: 1, lang: 'TypeScript', code: 'let total: number = 0;' },
+                    { category: 'typescript', level: 2, lang: 'TypeScript', code: 'interface User { id: number; name: string; }' },
+                    { category: 'typescript', level: 2, lang: 'TypeScript', code: 'const fetchData = async (url: string): Promise<Response> => fetch(url);' },
+                    { category: 'typescript', level: 3, lang: 'TypeScript', code: 'type Result<T> = { ok: true; value: T } | { ok: false; error: string };' }
+                ];
+
+                this.categories = ['htmlcss', 'python', 'java', 'php', 'sql', 'typescript'];
+                this.selectedCategory = 'htmlcss';
+                this.currentSnippetIndex = 0;
+                this.currentSnippet = this.codeSnippets[0];
+
+                // DEFINIÇÕES DE UPGRADES
+                this.upgradeDefinitions = [
+                    // TEAM (CPS)
+                    { id: 'intern', type: 'team', baseCost: 40, power: 1, icon: 'fa-user-graduate', keyName: 'up_intern_name', keyDesc: 'up_intern_desc' },
+                    { id: 'jr_dev', type: 'team', baseCost: 350, power: 6, icon: 'fa-user-code', keyName: 'up_jr_dev_name', keyDesc: 'up_jr_dev_desc' },
+                    { id: 'pleno_dev', type: 'team', baseCost: 2000, power: 30, icon: 'fa-user-gear', keyName: 'up_pleno_dev_name', keyDesc: 'up_pleno_dev_desc' },
+                    { id: 'sr_dev', type: 'team', baseCost: 10000, power: 130, icon: 'fa-user-ninja', keyName: 'up_sr_dev_name', keyDesc: 'up_sr_dev_desc' },
+                    { id: 'tech_lead', type: 'team', baseCost: 50000, power: 600, icon: 'fa-sitemap', keyName: 'up_tech_lead_name', keyDesc: 'up_tech_lead_desc' },
+                    { id: 'ai_copilot', type: 'team', baseCost: 250000, power: 2800, icon: 'fa-robot', keyName: 'up_ai_copilot_name', keyDesc: 'up_ai_copilot_desc' },
+
+                    // TYPING SKILLS
+                    { id: 'mech_kb', type: 'skills', baseCost: 100, charBonus: 0.20, icon: 'fa-keyboard', keyName: 'up_mech_kb_name', keyDesc: 'up_mech_kb_desc' },
+                    { id: 'typing_tutor', type: 'skills', baseCost: 800, comboBonus: 0.05, icon: 'fa-graduation-cap', keyName: 'up_typing_tutor_name', keyDesc: 'up_typing_tutor_desc' },
+                    { id: 'flow_state', type: 'skills', baseCost: 5000, lineRewardBonus: 0.50, icon: 'fa-bolt', keyName: 'up_flow_state_name', keyDesc: 'up_flow_state_desc' },
+
+                    // HARDWARE & SOFTWARE (Multiplicadores Globais)
+                    { id: 'ssd_nvme', type: 'hardware', baseCost: 1500, multiplier: 0.15, icon: 'fa-microchip', keyName: 'up_ssd_nvme_name', keyDesc: 'up_ssd_nvme_desc' },
+                    { id: 'cloud_cluster', type: 'hardware', baseCost: 30000, multiplier: 0.35, icon: 'fa-cloud', keyName: 'up_cloud_cluster_name', keyDesc: 'up_cloud_cluster_desc' },
+                    { id: 'rust_refactor', type: 'hardware', baseCost: 200000, multiplier: 0.75, icon: 'fa-gear', keyName: 'up_rust_refactor_name', keyDesc: 'up_rust_refactor_desc' }
+                ];
+
+                // DEFINIÇÕES DE CONQUISTAS
+                this.achievementDefinitions = [
+                    { id: 'first_line', reqType: 'linesTyped', reqVal: 1, icon: 'fa-code', keyTitle: 'ach_first_line_title', keyDesc: 'ach_first_line_desc' },
+                    { id: 'typing_master', reqType: 'linesTyped', reqVal: 15, icon: 'fa-keyboard', keyTitle: 'ach_typing_master_title', keyDesc: 'ach_typing_master_desc' },
+                    { id: 'speed_demon', reqType: 'maxCombo', reqVal: 2.0, icon: 'fa-bolt', keyTitle: 'ach_speed_demon_title', keyDesc: 'ach_speed_demon_desc' },
+                    { id: 'server_hero', reqType: 'serverFix', reqVal: 1, icon: 'fa-shield-halved', keyTitle: 'ach_server_hero_title', keyDesc: 'ach_server_hero_desc' }
+                ];
+
+                this.goals = [100, 1000, 10000, 100000, 1000000];
+
+                this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
+                this.init();
+            }
+
+            init() {
+                this.loadGame();
+                this.initAuth();
+                this.applyLanguageUI();
+                this.changeTheme(this.state.theme || 'vscode');
+                this.loadNextSnippet();
+                this.renderShop();
+                this.renderAchievements();
+                this.updateUI();
+
+                // Manter foco no input de digitação para fluidez do jogo
+                const inputEl = document.getElementById('typingInput');
+                document.addEventListener('click', (e) => {
+                    this.music.start();
+                    if (!e.target.closest('button') && !e.target.closest('select') && !e.target.closest('a')) {
+                        inputEl.focus();
+                    }
+                });
+
+                // Game Loop Principal (100ms)
+                let lastTime = Date.now();
+                setInterval(() => {
+                    const now = Date.now();
+                    const delta = (now - lastTime) / 1000;
+                    lastTime = now;
+                    this.gameLoop(delta);
+                }, 100);
+
+                // Auto-save a cada 15s
+                setInterval(() => this.saveGame(false), 15000);
+
+                // Agendador de Eventos de Servidor
+                this.scheduleServerIncidents();
+            }
+
+            gameLoop(delta) {
+                if (!this.state.serverOutage) {
+                    const cps = this.calculateCPS();
+                    if (cps > 0) {
+                        const earned = cps * delta;
+                        this.state.loc += earned;
+                        this.state.totalLocEarned += earned;
+                    }
+                }
+
+                this.checkAchievements();
+                this.updateUI();
+            }
+
+            // TROCA DE IDIOMA DINÂMICA
+            setLanguage(langCode) {
+                if (!TRANSLATIONS[langCode]) return;
+                this.lang = langCode;
+                document.getElementById('langSelect').value = langCode;
+                this.applyLanguageUI();
+                this.renderShop();
+                this.renderAchievements();
+                this.updateUI();
+            }
+
+            applyLanguageUI() {
+                const dict = TRANSLATIONS[this.lang];
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[key]) el.innerText = dict[key];
+                });
+
+                if (this.state.serverOutage) {
+                    document.getElementById('serverStatusText').innerText = dict.serverOutageMsg;
+                } else {
+                    document.getElementById('serverStatusText').innerText = dict.serverOk;
+                }
+            }
+
+            // MULTIPLICADORES E CÁLCULOS
+            getGlobalMultiplier() {
+                let mult = 1.0 + (this.state.prestigeMultiplier || 0);
+                this.upgradeDefinitions.filter(u => u.multiplier).forEach(u => {
+                    const count = this.state.upgrades[u.id] || 0;
+                    mult += u.multiplier * count;
+                });
+                return mult;
+            }
+
+            calculateCPS() {
+                let baseCps = 0.0;
+                this.upgradeDefinitions.filter(u => u.type === 'team').forEach(u => {
+                    baseCps += u.power * (this.state.upgrades[u.id] || 0);
+                });
+                return baseCps * this.getGlobalMultiplier();
+            }
+
+            // COMPRA EM LOTE / FÓRMULA GEOMÉTRICA
+            getUpgradeCostForAmount(upgrade, amount) {
+                const r = 1.15;
+                const current = this.state.upgrades[upgrade.id] || 0;
+                const base = upgrade.baseCost;
+
+                if (amount === 1) {
+                    return Math.floor(base * Math.pow(r, current));
+                }
+
+                const totalCost = base * (Math.pow(r, current + amount) - Math.pow(r, current)) / (r - 1);
+                return Math.floor(totalCost);
+            }
+
+            getMaxAffordableCount(upgrade) {
+                const r = 1.15;
+                const current = this.state.upgrades[upgrade.id] || 0;
+                const base = upgrade.baseCost;
+                const currentLoc = this.state.loc;
+
+                const term1 = (currentLoc * (r - 1)) / (base * Math.pow(r, current));
+                if (term1 <= 0) return 0;
+
+                const count = Math.floor(Math.log(term1 + 1) / Math.log(r));
+                return Math.max(0, count);
+            }
+
+            // SISTEMA DE DIGITAÇÃO
+            getUnlockedLevel() {
+                if (this.state.linesCompleted >= 30) return 3;
+                if (this.state.linesCompleted >= 10) return 2;
+                return 1;
+            }
+
+            setCategory(cat) {
+                if (!this.categories.includes(cat)) return;
+                this.selectedCategory = cat;
+                this.loadNextSnippet();
+            }
+
+            loadNextSnippet() {
+                const maxLevel = this.getUnlockedLevel();
+                const pool = this.codeSnippets.filter(s => s.category === this.selectedCategory && s.level <= maxLevel);
+                const list = pool.length ? pool : this.codeSnippets;
+                this.currentSnippet = list[Math.floor(Math.random() * list.length)];
+
+                document.getElementById('typingLangBadge').innerText = this.currentSnippet.lang;
+                document.getElementById('levelBadge').innerText = 'Nível ' + this.currentSnippet.level;
+                const inputEl = document.getElementById('typingInput');
+                inputEl.value = '';
+                inputEl.focus();
+                this.renderSnippetProgress('');
+            }
+
+            renderSnippetProgress(input) {
+                const target = this.currentSnippet.code;
+                const container = document.getElementById('codeSnippetTarget');
+                let html = '';
+
+                for (let i = 0; i < target.length; i++) {
+                    const char = target[i] === ' ' ? '&nbsp;' : target[i];
+
+                    if (i < input.length) {
+                        if (input[i] === target[i]) {
+                            html += `<span class="typing-correct">${char}</span>`;
+                        } else {
+                            html += `<span class="typing-wrong">${char}</span>`;
+                        }
+                    } else if (i === input.length) {
+                        html += `<span class="cursor-blink"></span><span class="typing-pending">${char}</span>`;
+                    } else {
+                        html += `<span class="typing-pending">${char}</span>`;
+                    }
+                }
+
+                container.innerHTML = html;
+            }
+
+            handleTypingInput(input) {
+                const target = this.currentSnippet.code;
+                this.renderSnippetProgress(input);
+
+                if (input.length > 0) {
+                    const lastCharIndex = input.length - 1;
+                    if (input[lastCharIndex] === target[lastCharIndex]) {
+                        this.sound.playKeyStroke();
+                        this.state.totalCharactersTyped++;
+
+                        // Bônus base por caractere + upgrade de teclado
+                        const kbUpgradeBonus = 1.0 + ((this.state.upgrades['mech_kb'] || 0) * 0.20);
+                        const charBonus = 1 * kbUpgradeBonus * this.state.typingCombo * this.getGlobalMultiplier();
+
+                        this.state.loc += charBonus;
+                        this.state.totalLocEarned += charBonus;
+                    } else {
+                        this.sound.playKeyError();
+                        this.state.typingCombo = Math.max(1.0, this.state.typingCombo - 0.05);
+                    }
+                }
+
+                // Quando completa a linha
+                if (input === target) {
+                    this.sound.playLineComplete();
+                    this.state.linesCompleted++;
+
+                    const comboStep = 0.15 + ((this.state.upgrades['typing_tutor'] || 0) * 0.05);
+                    this.state.typingCombo = Math.min(3.5, this.state.typingCombo + comboStep);
+
+                    const flowBonus = 1.0 + ((this.state.upgrades['flow_state'] || 0) * 0.50);
+                    const lineReward = target.length * 2.5 * this.state.typingCombo * flowBonus * this.getGlobalMultiplier();
+
+                    this.state.loc += lineReward;
+                    this.state.totalLocEarned += lineReward;
+
+                    const dict = TRANSLATIONS[this.lang];
+                    this.showToast(`${dict.lineCompletedToast} +${this.formatNumber(lineReward)} LOC`, 'success');
+                    this.logConsole(`Compiled [${this.currentSnippet.lang}]: Line completed cleanly.`);
+
+                    this.loadNextSnippet();
+                }
+
+                this.updateUI();
+            }
+
+            skipSnippet() {
+                this.state.typingCombo = 1.0;
+                this.logConsole('Code line skipped.');
+                this.loadNextSnippet();
+                this.updateUI();
+            }
+
+            // COMPRA DE UPGRADES
+            setBuyMultiplier(amount) {
+                this.buyMultiplier = amount;
+
+                document.querySelectorAll('.buy-amount-btn').forEach(btn => {
+                    btn.className = "buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/10 border border-white/5 opacity-60";
+                });
+
+                const activeBtn = document.getElementById(`buyAmount${amount}`);
+                if (activeBtn) {
+                    activeBtn.className = "buy-amount-btn flex-1 py-1 text-xs code-font font-bold rounded bg-black/50 border border-white/20 text-accent-p";
+                }
+
+                this.renderShop();
+                this.updateUI();
+            }
+
+            buyUpgrade(upgradeId) {
+                const upgrade = this.upgradeDefinitions.find(u => u.id === upgradeId);
+                if (!upgrade) return;
+
+                let amountToBuy = 0;
+                let cost = 0;
+
+                if (this.buyMultiplier === 'MAX') {
+                    amountToBuy = this.getMaxAffordableCount(upgrade);
+                    while (amountToBuy > 0 && this.getUpgradeCostForAmount(upgrade, amountToBuy) > this.state.loc) {
+                        amountToBuy--;
+                    }
+                    if (amountToBuy <= 0) {
+                        this.showToast(TRANSLATIONS[this.lang].insufficientLoc, 'error');
+                        return;
+                    }
+                    cost = this.getUpgradeCostForAmount(upgrade, amountToBuy);
+                } else {
+                    amountToBuy = parseInt(this.buyMultiplier);
+                    cost = this.getUpgradeCostForAmount(upgrade, amountToBuy);
+                }
+
+                if (this.state.loc >= cost && amountToBuy > 0) {
+                    this.state.loc -= cost;
+                    this.state.upgrades[upgradeId] = (this.state.upgrades[upgradeId] || 0) + amountToBuy;
+
+                    this.sound.playBuy();
+                    this.logConsole(`Purchased: ${upgradeId} (+${amountToBuy})`);
+
+                    this.renderShop();
+                    this.updateUI();
+                } else {
+                    this.showToast(TRANSLATIONS[this.lang].insufficientLoc, 'error');
+                }
+            }
+
+            buyMaxAll() {
+                let boughtAny = true;
+                let safety = 0;
+                while (boughtAny && safety < 50) {
+                    boughtAny = false;
+                    safety++;
+                    for (const upgrade of this.upgradeDefinitions) {
+                        let amount = this.getMaxAffordableCount(upgrade);
+                        while (amount > 0 && this.getUpgradeCostForAmount(upgrade, amount) > this.state.loc) amount--;
+                        if (amount > 0) {
+                            const cost = this.getUpgradeCostForAmount(upgrade, amount);
+                            this.state.loc -= cost;
+                            this.state.upgrades[upgrade.id] = (this.state.upgrades[upgrade.id] || 0) + amount;
+                            boughtAny = true;
+                        }
+                    }
+                }
+                this.sound.playBuy();
+                this.logConsole('Compra máxima em todos os itens executada.');
+                this.renderShop();
+                this.updateUI();
+            }
+
+            // INCIDENTES DE SERVIDOR
+            scheduleServerIncidents() {
+                const nextTime = Math.random() * 50000 + 50000; // 50-100s
+                setTimeout(() => {
+                    if (!this.state.serverOutage && Math.random() < 0.35) {
+                        this.triggerServerOutage();
+                    }
+                    this.scheduleServerIncidents();
+                }, nextTime);
+            }
+
+            triggerServerOutage() {
+                this.state.serverOutage = true;
+                this.sound.playAlarm();
+
+                const statusCard = document.getElementById('serverStatusCard');
+                const badge = document.getElementById('serverStatusBadge');
+                const statusText = document.getElementById('serverStatusText');
+                const fixBtn = document.getElementById('fixServerBtn');
+
+                statusCard.classList.add('border-red-500/80', 'bg-red-950/20');
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse";
+                badge.innerText = "OUTAGE";
+
+                const dict = TRANSLATIONS[this.lang];
+                statusText.innerText = dict.serverOutageMsg;
+                fixBtn.classList.remove('hidden');
+
+                this.showToast(dict.serverOutageToast, 'error');
+                this.logConsole('CRITICAL SYSTEM ALERT: Server instance unresponsive.');
+            }
+
+            resolveServerOutage() {
+                this.state.serverOutage = false;
+                this.sound.playLineComplete();
+
+                const statusCard = document.getElementById('serverStatusCard');
+                const badge = document.getElementById('serverStatusBadge');
+                const statusText = document.getElementById('serverStatusText');
+                const fixBtn = document.getElementById('fixServerBtn');
+
+                statusCard.classList.remove('border-red-500/80', 'bg-red-950/20');
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerText = "ONLINE";
+
+                const dict = TRANSLATIONS[this.lang];
+                statusText.innerText = dict.serverOk;
+                fixBtn.classList.add('hidden');
+
+                this.showToast(dict.serverFixedToast, 'success');
+                this.logConsole('Emergency patch deployed. Operational status restored.');
+
+                this.state.serverFixedCount = (this.state.serverFixedCount || 0) + 1;
+                this.updateUI();
+            }
+
+            // RENDERIZAÇÃO DA UI
+            updateUI() {
+                document.getElementById('locDisplay').innerText = this.formatNumber(Math.floor(this.state.loc));
+                document.getElementById('cpsDisplay').innerText = this.formatNumber(this.calculateCPS(), true) + (this.state.serverOutage ? ' (PAUSED)' : '');
+                document.getElementById('globalMultiplierDisplay').innerText = `${this.getGlobalMultiplier().toFixed(2)}x`;
+
+                document.getElementById('comboDisplay').innerText = `${this.state.typingCombo.toFixed(2)}x`;
+                document.getElementById('linesCompletedDisplay').innerText = this.state.linesCompleted;
+
+                // Calcular WPM/CPM
+                const elapsedMinutes = Math.max(0.1, (Date.now() - this.state.startTime) / 60000);
+                const cpm = Math.floor(this.state.totalCharactersTyped / elapsedMinutes);
+                const wpm = Math.floor(cpm / 5);
+                document.getElementById('typingSpeedDisplay').innerText = `${wpm} WPM / ${cpm} CPM`;
+
+                this.updateProgressBar();
+
+                // Atualizar estado de disponibilidade na loja
+                this.upgradeDefinitions.forEach(upgrade => {
+                    const card = document.getElementById(`upgrade-card-${upgrade.id}`);
+                    if (card) {
+                        let amount = this.buyMultiplier === 'MAX' ? Math.max(1, this.getMaxAffordableCount(upgrade)) : parseInt(this.buyMultiplier);
+                        let cost = this.getUpgradeCostForAmount(upgrade, amount);
+
+                        const btn = card.querySelector('button');
+                        const costText = card.querySelector('.cost-display');
+
+                        if (costText) costText.innerText = `${this.formatNumber(cost)} LOC`;
+
+                        if (this.state.loc >= cost && amount > 0) {
+                            card.classList.remove('opacity-50');
+                            if (btn) btn.disabled = false;
+                        } else {
+                            card.classList.add('opacity-50');
+                            if (btn) btn.disabled = true;
+                        }
+                    }
+                });
+            }
+
+            updateProgressBar() {
+                const currentGoal = this.goals.find(g => g > this.state.totalLocEarned) || this.goals[this.goals.length - 1];
+                const prevGoal = this.goals[this.goals.indexOf(currentGoal) - 1] || 0;
+                const progress = Math.min(100, Math.max(0, ((this.state.totalLocEarned - prevGoal) / (currentGoal - prevGoal)) * 100));
+
+                document.getElementById('goalProgressBar').style.width = `${progress}%`;
+                document.getElementById('nextGoalPercent').innerText = `${Math.floor(progress)}%`;
+                document.getElementById('nextGoalText').innerText = `${TRANSLATIONS[this.lang].nextGoalLabel}: ${this.formatNumber(currentGoal)} LOC`;
+            }
+
+            renderShop() {
+                const container = document.getElementById('shopContainer');
+                container.innerHTML = '';
+
+                const dict = TRANSLATIONS[this.lang];
+                const filteredUpgrades = this.upgradeDefinitions.filter(u => u.type === this.activeTab);
+
+                filteredUpgrades.forEach(upgrade => {
+                    const count = this.state.upgrades[upgrade.id] || 0;
+
+                    let amount = this.buyMultiplier === 'MAX' ? Math.max(1, this.getMaxAffordableCount(upgrade)) : parseInt(this.buyMultiplier);
+                    let cost = this.getUpgradeCostForAmount(upgrade, amount);
+                    const canAfford = this.state.loc >= cost && amount > 0;
+
+                    const title = dict[upgrade.keyName] || upgrade.keyName;
+                    const desc = dict[upgrade.keyDesc] || upgrade.keyDesc;
+
+                    const card = document.createElement('div');
+                    card.id = `upgrade-card-${upgrade.id}`;
+                    card.className = `p-2.5 rounded-xl bg-black/30 border border-white/10 flex items-center justify-between gap-2 transition ${canAfford ? '' : 'opacity-50'}`;
+
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-lg bg-black/50 flex items-center justify-center text-accent-p border border-white/10 flex-shrink-0">
+                                <i class="fa-solid ${upgrade.icon} text-base"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h4 class="font-bold text-xs">${title}</h4>
+                                    <span class="text-[10px] code-font px-1 py-0.2 bg-black/60 text-accent-p border border-white/10 rounded">x${count}</span>
+                                </div>
+                                <p class="text-[10px] opacity-70 mt-0.5 leading-tight">${desc}</p>
+                            </div>
+                        </div>
+                        <button onclick="game.buyUpgrade('${upgrade.id}')" ${canAfford ? '' : 'disabled'} class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-black/40 text-white font-bold text-xs code-font transition flex flex-col items-center min-w-[80px] flex-shrink-0">
+                            <span>${dict.buyBtn}</span>
+                            <span class="cost-display text-[9px] opacity-90">${this.formatNumber(cost)} LOC</span>
+                        </button>
+                    `;
+
+                    container.appendChild(card);
+                });
+            }
+
+            renderAchievements() {
+                const container = document.getElementById('achievementsContainer');
+                container.innerHTML = '';
+                const dict = TRANSLATIONS[this.lang];
+                let unlockedCount = 0;
+
+                this.achievementDefinitions.forEach(ach => {
+                    const isUnlocked = !!this.state.achievements[ach.id];
+                    if (isUnlocked) unlockedCount++;
+
+                    const title = dict[ach.keyTitle] || ach.keyTitle;
+                    const desc = dict[ach.keyDesc] || ach.keyDesc;
+
+                    const item = document.createElement('div');
+                    item.className = `p-2 rounded-lg border text-xs flex items-center gap-2.5 transition ${isUnlocked ? 'bg-amber-500/10 border-amber-500/30' : 'bg-black/20 border-white/5 opacity-50'}`;
+
+                    item.innerHTML = `
+                        <div class="w-7 h-7 rounded-full ${isUnlocked ? 'bg-amber-500/20 text-amber-400' : 'bg-black/40 opacity-50'} flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid ${ach.icon} text-xs"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-[11px] ${isUnlocked ? 'text-amber-300' : 'opacity-70'}">${title}</div>
+                            <div class="text-[10px] opacity-60 leading-tight">${desc}</div>
+                        </div>
+                        ${isUnlocked ? '<i class="fa-solid fa-check text-accent-p text-xs mr-1"></i>' : ''}
+                    `;
+
+                    container.appendChild(item);
+                });
+
+                document.getElementById('achievementRatio').innerText = `${unlockedCount}/${this.achievementDefinitions.length}`;
+            }
+
+            checkAchievements() {
+                this.achievementDefinitions.forEach(ach => {
+                    if (this.state.achievements[ach.id]) return;
+
+                    let unlocked = false;
+                    if (ach.reqType === 'linesTyped' && this.state.linesCompleted >= ach.reqVal) unlocked = true;
+                    if (ach.reqType === 'maxCombo' && this.state.typingCombo >= ach.reqVal) unlocked = true;
+                    if (ach.reqType === 'serverFix' && (this.state.serverFixedCount || 0) >= ach.reqVal) unlocked = true;
+
+                    if (unlocked) {
+                        this.state.achievements[ach.id] = true;
+                        this.sound.playLineComplete();
+
+                        const title = TRANSLATIONS[this.lang][ach.keyTitle] || ach.keyTitle;
+                        this.showToast(`🏆 ${title}`, 'achievement');
+                        this.logConsole(`Achievement Unlocked: ${title}`);
+                        this.renderAchievements();
+                    }
+                });
+            }
+
+            switchTab(tab) {
+                this.activeTab = tab;
+                const tabs = ['team', 'skills', 'hardware'];
+
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+                    if (btn) {
+                        if (t === tab) {
+                            btn.className = "py-2 text-[10px] font-bold uppercase rounded-lg bg-black/40 text-accent-p border border-white/10 transition";
+                        } else {
+                            btn.className = "py-2 text-[10px] font-bold uppercase rounded-lg opacity-60 hover:opacity-100 transition";
+                        }
+                    }
+                });
+
+                this.renderShop();
+            }
+
+            changeTheme(themeName) {
+                this.state.theme = themeName;
+                document.body.setAttribute('data-theme', themeName);
+                document.documentElement.setAttribute('data-theme', themeName);
+                document.getElementById('themeSelect').value = themeName;
+                document.documentElement.style.colorScheme = 'dark';
+            }
+
+            logConsole(text) {
+                const logs = document.getElementById('consoleLogs');
+                const time = new Date().toLocaleTimeString().split(' ')[0];
+                const p = document.createElement('p');
+                p.className = "truncate";
+                p.innerHTML = `<span class="opacity-50">[${time}]</span> ${text}`;
+                logs.appendChild(p);
+
+                while (logs.children.length > 3) {
+                    logs.removeChild(logs.firstChild);
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+
+                let bgColor = "bg-black/80 border-white/20 text-white";
+                let icon = "fa-circle-info text-accent-s";
+
+                if (type === 'success') {
+                    bgColor = "bg-emerald-950/90 border-emerald-500/50 text-emerald-200";
+                    icon = "fa-circle-check text-emerald-400";
+                } else if (type === 'error') {
+                    bgColor = "bg-red-950/90 border-red-500/50 text-red-200";
+                    icon = "fa-circle-xmark text-red-400";
+                } else if (type === 'achievement') {
+                    bgColor = "bg-amber-950/90 border-amber-500/50 text-amber-200";
+                    icon = "fa-trophy text-amber-400";
+                }
+
+                toast.className = `p-3 rounded-xl border backdrop-blur shadow-2xl flex items-center gap-2.5 text-xs font-medium ${bgColor} transition-all duration-300 transform translate-y-4 opacity-0 max-w-xs`;
+                toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span>${message}</span>`;
+
+                container.appendChild(toast);
+
+                setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3200);
+            }
+
+            toggleMusic() {
+                const on = this.music.toggle();
+                document.getElementById('musicText').innerText = on ? 'Música: ON' : 'Música: OFF';
+                document.getElementById('musicIcon').className = on ? 'fa-solid fa-music text-accent-p' : 'fa-solid fa-music opacity-50';
+            }
+
+            toggleSound() {
+                this.sound.enabled = !this.sound.enabled;
+                const icon = document.getElementById('soundIcon');
+                const text = document.getElementById('soundText');
+
+                if (this.sound.enabled) {
+                    icon.className = "fa-solid fa-volume-high text-accent-p";
+                    text.innerText = "Som: ON";
+                } else {
+                    icon.className = "fa-solid fa-volume-xmark opacity-50";
+                    text.innerText = "Som: OFF";
+                }
+            }
+
+            formatNumber(num, decimal = false) {
+                if (num < 1000) return decimal ? num.toFixed(1) : Math.floor(num).toString();
+                const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi"];
+                const i = Math.floor(Math.log10(num) / 3);
+                const formatted = (num / Math.pow(10, i * 3)).toFixed(2);
+                return `${formatted} ${suffixes[i]}`;
+            }
+
+            // AUTENTICAÇÃO E SINCRONIZAÇÃO (SUPABASE)
+            async initAuth() {
+                this.currentUser = null;
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session?.user) {
+                    await this.onAuthReady(session.user);
+                } else if (localStorage.getItem('dev_typist_skip_auth') !== '1') {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                } else {
+                    document.getElementById('authOverlay').classList.add('hidden');
+                }
+
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session?.user) {
+                        this.onAuthReady(session.user);
+                    } else if (event === 'SIGNED_OUT') {
+                        this.currentUser = null;
+                        document.getElementById('accountBadge').innerText = 'Visitante';
+                    }
+                });
+            }
+
+            async onAuthReady(user) {
+                this.currentUser = user;
+                document.getElementById('authOverlay').classList.add('hidden');
+                document.getElementById('accountBadge').innerText = user.email;
+                await this.loadFromCloud();
+            }
+
+            showAuthError(message) {
+                const el = document.getElementById('authError');
+                el.innerText = message;
+                el.classList.remove('hidden');
+            }
+
+            async signUp() {
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value;
+                if (!email || password.length < 6) {
+                    this.showAuthError('E-mail válido e senha com 6+ caracteres.');
+                    return;
+                }
+                const { error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) {
+                    this.showAuthError(error.message);
+                    return;
+                }
+                this.showAuthError('Conta criada! Se a confirmação por e-mail estiver ativa, confira sua caixa de entrada antes de entrar.');
+            }
+
+            async signIn() {
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value;
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    this.showAuthError(error.message);
+                }
+            }
+
+            async signInWithGoogle() {
+                const { error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname,
+                        queryParams: { prompt: 'select_account' }
+                    }
+                });
+                if (error) this.showAuthError(error.message);
+            }
+
+            async switchAccount() {
+                // Visitante: só abre a tela de login (o progresso local vira o da conta se ela estiver vazia)
+                if (!this.currentUser) {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                    return;
+                }
+                if (!window.confirm('Trocar de conta? Seu progresso será salvo antes de sair.')) return;
+
+                this.switching = true; // bloqueia o autosave durante a troca
+                const { error } = await supabaseClient
+                    .from('devtypist_saves')
+                    .upsert({ user_id: this.currentUser.id, state: this.state, updated_at: new Date().toISOString() });
+
+                if (error && !window.confirm('Não consegui salvar na nuvem. Se continuar, o progresso não salvo será perdido. Trocar mesmo assim?')) {
+                    this.switching = false;
+                    return;
+                }
+
+                // Limpa o save local para o progresso desta conta não vazar para a próxima
+                localStorage.removeItem('dev_typist_pro_save');
+                localStorage.removeItem('dev_typist_skip_auth');
+                await supabaseClient.auth.signOut({ scope: 'local' }); // só neste dispositivo
+                window.location.reload();
+            }
+
+            async signOut() {
+                await supabaseClient.auth.signOut();
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+
+            skipAuth() {
+                localStorage.setItem('dev_typist_skip_auth', '1');
+                document.getElementById('authOverlay').classList.add('hidden');
+            }
+
+            accountBadgeClick() {
+                if (this.currentUser) {
+                    if (window.confirm('Sair da conta?')) this.signOut();
+                } else {
+                    document.getElementById('authOverlay').classList.remove('hidden');
+                }
+            }
+
+            async loadFromCloud() {
+                if (!this.currentUser) return;
+                const { data, error } = await supabaseClient
+                    .from('devtypist_saves')
+                    .select('state')
+                    .eq('user_id', this.currentUser.id)
+                    .maybeSingle();
+
+                if (!error && data?.state && Object.keys(data.state).length > 0) {
+                    this.state = { ...this.state, ...data.state };
+                    this.renderShop();
+                    this.renderAchievements();
+                    this.updateUI();
+                    this.logConsole('Progresso carregado da nuvem.');
+                } else {
+                    await this.saveToCloud();
+                }
+            }
+
+            async saveToCloud() {
+                if (!this.currentUser) return;
+                await supabaseClient
+                    .from('devtypist_saves')
+                    .upsert({ user_id: this.currentUser.id, state: this.state, updated_at: new Date().toISOString() });
+            }
+
+            saveGame(manual = false) {
+                if (this.switching) return;
+                try {
+                    const dataToSave = { ...this.state, lang: this.lang };
+                    localStorage.setItem('dev_typist_pro_save', JSON.stringify(dataToSave));
+                    if (this.currentUser) this.saveToCloud();
+                    if (manual) this.showToast(TRANSLATIONS[this.lang].savedSuccess, 'success');
+                } catch (e) {
+                    console.error("Save error", e);
+                }
+            }
+
+            loadGame() {
+                try {
+                    const saved = localStorage.getItem('dev_typist_pro_save');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        this.state = { ...this.state, ...parsed };
+                        if (parsed.lang) this.lang = parsed.lang;
+                    }
+                } catch (e) {
+                    console.error("Load error", e);
+                }
+            }
+
+            prestige() {
+                const earned = this.state.totalLocEarned || 0;
+                if (earned < 1000) {
+                    this.showToast('Ganhe pelo menos 1.000 LOC totais antes de reiniciar a carreira.', 'error');
+                    return;
+                }
+                const bonus = Math.sqrt(earned) / 100;
+                if (!window.confirm(`Reiniciar sua carreira? Você zera LOC e upgrades, mas ganha +${(bonus * 100).toFixed(1)}% de multiplicador permanente para crescer mais rápido depois.`)) return;
+
+                this.state.prestigeMultiplier = (this.state.prestigeMultiplier || 0) + bonus;
+                this.state.prestigeCount = (this.state.prestigeCount || 0) + 1;
+                this.state.loc = 0;
+                this.state.totalLocEarned = 0;
+                this.state.typingCombo = 1.0;
+                this.upgradeDefinitions.forEach(u => this.state.upgrades[u.id] = 0);
+
+                this.saveGame(false);
+                this.renderShop();
+                this.updateUI();
+                this.showToast(`Nova carreira iniciada! Multiplicador permanente: +${(this.state.prestigeMultiplier * 100).toFixed(1)}%`, 'achievement');
+                this.logConsole('Career restarted with permanent multiplier bonus.');
+            }
+
+            confirmReset() {
+                if (window.confirm(TRANSLATIONS[this.lang].resetConfirm)) {
+                    localStorage.removeItem('dev_typist_pro_save');
+                    window.location.reload();
+                }
+            }
+        }
+
+        let game;
+        window.addEventListener('DOMContentLoaded', () => {
+            game = new DevTypistGame();
+        });
+    </script>
+</body>
+</html>

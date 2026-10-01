@@ -1,5 +1,5 @@
 ::: {align="center"}
-# ⌨️ Dev Typist Pro
+# ⌨️ Dev Game
 
 ### `CODE • TYPE • LEARN • LEVEL UP`
 
@@ -15,9 +15,9 @@
 
 ## 🇧🇷 Português
 
-### 🎮 Sobre o Dev Typist Pro
+### 🎮 Sobre o Dev Game
 
-**Dev Typist Pro** é um jogo educacional web que mistura **digitação de
+**Dev Game** é um jogo educacional web que mistura **digitação de
 código, programação, progressão idle/clicker e desafios rápidos de
 lógica**.
 
@@ -42,7 +42,7 @@ e raciocínio.
 
 ``` text
 ┌──────────────────────────────────────┐
-│            DEV TYPIST PRO            │
+│            DEV Game            │
 ├──────────────────────────────────────┤
 │  ⌨️ Terminal de código               │
 │  📈 LOC + XP + níveis                │
@@ -168,7 +168,7 @@ local.
 
 ### ☁️ Contas e salvamento
 
-O Dev Typist Pro oferece:
+O Dev Game oferece:
 
 ``` text
 👤 Visitante          → progresso local
@@ -219,9 +219,9 @@ Ideias para próximas versões:
 
 ## 🇺🇸 English
 
-### 🎮 About Dev Typist Pro
+### 🎮 About Dev Game
 
-**Dev Typist Pro** is an educational web game that combines **code
+**Dev Game** is an educational web game that combines **code
 typing, programming practice, idle/clicker progression, and short logic
 challenges**.
 
@@ -239,7 +239,7 @@ Typing builds familiarity with syntax. Micro-lessons introduce concepts
 in small pieces. Challenges and bug hunts encourage interpretation and
 problem-solving.
 
-> Dev Typist Pro is not intended to replace courses, documentation, or
+> Dev Game is not intended to replace courses, documentation, or
 > real development projects. It is designed as a complementary and
 > entertaining practice tool.
 
@@ -247,7 +247,7 @@ problem-solving.
 
 ``` text
 ┌──────────────────────────────────────┐
-│            DEV TYPIST PRO            │
+│            DEV GAME            │
 ├──────────────────────────────────────┤
 │  ⌨️ Code typing terminal             │
 │  📈 LOC + XP + levels                │
@@ -469,7 +469,7 @@ redistribution or external contributions, add a `LICENSE` file.
 ::: {align="center"}
 ### `> READY TO CODE_`
 
-**Dev Typist Pro © 2026**
+**Dev Game © 2026**
 
 ⌨️ **Type. Learn. Level up.**
 :::
